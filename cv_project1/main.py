@@ -10,6 +10,9 @@ from PyQt5 import QtWidgets
 import os.path
 import platform
 import subprocess
+
+from canvas import Canvas
+
 from functools import partial
 
 from PyQt5.QtGui import *
@@ -39,9 +42,11 @@ class MainWindow(QMainWindow, WindowMixin):
         help=self.menu('&Help')) 
          
         
-        self.image = QImage()
         self.filePath = None
         self.imageData = None
+        self.pixmap = None
+        
+        self.canvas = Canvas(parent=self)
 
         action = partial(newAction, self)
         
@@ -62,8 +67,11 @@ class MainWindow(QMainWindow, WindowMixin):
         help = action( 'tutorial' , self.showTutorialDialog, None, 'help',  'tutorialDetail' )
         showInfo = action('info', self.showInfoDialog, None, 'help', 'info')
 
-        addActions(self.menus.help,  (help,showInfo))
-
+        addActions(self.menus.help,  (help,showInfo)) 
+        self.scroll = QScrollArea()
+        self.scroll.setWidget(self.canvas)
+        self.scroll.setWidgetResizable(True)  
+        self.setCentralWidget(self.scroll)
         
     def openFile(self, _value=False): 
         path = os.path.dirname(self.filePath) if self.filePath else '.'
@@ -88,11 +96,24 @@ class MainWindow(QMainWindow, WindowMixin):
                 self.status("Error reading %s" %  filePath)
                 return False
         
+            print("Loaded %s" % os.path.basename(filePath))
             self.image = image
-            self.filePath = filePath 
-            self.canvas.loadPixmap(QPixmap.fromImage(image))
+            self.filePath = filePath  
+            self.pixmap =QPixmap.fromImage(image)
+            
+            self.canvas.setEnabled(True)
+            self.canvas.loadPixmap(self.pixmap)
+            #写到这里 还没写canvas 
+            self.paintCanvas() 
+            print("paintCanvas()")
 
-            #写到这里 还没写canvas
+
+
+
+    def paintCanvas(self):
+        assert not self.image.isNull(), "cannot paint null image"  
+        self.canvas.update()
+
 
  
     def saveFile(self, _value=False):
