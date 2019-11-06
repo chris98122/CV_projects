@@ -46,11 +46,14 @@ class MainWindow(QMainWindow, WindowMixin):
         help=self.menu('&Help'),
         view=self.menu('&View'))
          
-        
+        self.defaultSaveDir = None
         self.filePath = None
         self.imageData = None
         self.pixmap = None
         
+        # Whether we need to save or not.
+        self.dirty = False
+
         self.canvas = Canvas(parent=self)
         
         self.image = QImage()
@@ -121,15 +124,54 @@ class MainWindow(QMainWindow, WindowMixin):
             zoomIn, zoomOut, zoomOrg,
             fitWindow, fitWidth))
 
-        
+        Roberts = action('Roberts operator', self.Roberts_op,
+                        None, 'Roberts operator', 'Roberts operator',
+                        enabled=False)
+
         # Callbacks:
         self.zoomWidget.valueChanged.connect(self.paintCanvas)
 
         self.actions = struct(save=save,   saveAs=saveAs, open=open,    zoom=zoom, zoomIn=zoomIn, zoomOut=zoomOut, zoomOrg=zoomOrg,
                               fitWindow=fitWindow, fitWidth=fitWidth,
-                              zoomActions=zoomActions)
+                              zoomActions=zoomActions,
+                                onLoadActive=(
+                                Roberts,Roberts))
         
+        self.RobertsButton = QToolButton()
+        self.RobertsButton.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
+        self.RobertsButton.setText('Roberts operator')
+
+       
+        self.RobertsButton.setDefaultAction(Roberts)
+
+       
+        listLayout = QVBoxLayout()
+        listLayout.setContentsMargins(0, 0, 0, 0)
+        listLayout.addWidget(self.RobertsButton)
+        
+        
+        buttonListContainer = QWidget()
+        buttonListContainer.setLayout(listLayout)
+
+        self.dock = QDockWidget('filters', self)
+        self.dock.setObjectName('filters')
+        self.dock.setWidget(buttonListContainer)
+        
+        self.dockFeatures = QDockWidget.DockWidgetClosable | QDockWidget.DockWidgetFloatable
+        self.dock.setFeatures(self.dock.features() ^ self.dockFeatures)
+        
+        self.addDockWidget(Qt.RightDockWidgetArea, self.dock)
+
+
     
+    def setDirty(self):
+        self.dirty = True
+        self.actions.save.setEnabled(True)
+
+    def Roberts_op(self):
+        print("roberts op")
+        self.setDirty()
+
     def scaleFitWindow(self):
         """Figure out the size of the pixmap in order to fit the main widget."""
         e = 2.0  # So that no scrollbars are generated.
@@ -200,6 +242,8 @@ class MainWindow(QMainWindow, WindowMixin):
         for z in self.actions.zoomActions:
             z.setEnabled(value) 
             print("enabled")
+        for action in self.actions.onLoadActive:
+            action.setEnabled(value)
 
     def setZoom(self, value):
         self.actions.fitWidth.setChecked(False)
