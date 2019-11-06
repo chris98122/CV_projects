@@ -20,7 +20,7 @@ class Canvas(QWidget):
         self.scale = 1.0
     
     def loadPixmap(self, pixmap):
-        self.pixmap = pixmap 
+        self.pixmap = pixmap
         self.repaint() 
         print("repaint")
 

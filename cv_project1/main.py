@@ -12,7 +12,7 @@ import platform
 import subprocess
 
 from canvas import Canvas
-
+from zoomWidget import ZoomWidget
 from functools import partial
 
 from PyQt5.QtGui import *
@@ -31,15 +31,20 @@ class WindowMixin(object):
  
 
 class MainWindow(QMainWindow, WindowMixin):
+    
+    FIT_WINDOW, FIT_WIDTH, MANUAL_ZOOM = list(range(3))
+
     def __init__(self, parent=None): 
         super(MainWindow, self).__init__()
         self.setWindowTitle(__appname__)
-        self.setGeometry(300, 300,800, 600) 
-
- 
+        
+        self.x_size = 800
+        self.y_size = 600
+        self.setGeometry(300, 300,self.x_size ,  self.y_size )  
         self.menus = struct(
         file=self.menu('&File'),
-        help=self.menu('&Help')) 
+        help=self.menu('&Help'),
+        view=self.menu('&View'))
          
         
         self.filePath = None
@@ -47,7 +52,8 @@ class MainWindow(QMainWindow, WindowMixin):
         self.pixmap = None
         
         self.canvas = Canvas(parent=self)
-
+        
+        self.image = QImage()
         action = partial(newAction, self)
         
         open = action('openFile', self.openFile,
@@ -68,11 +74,91 @@ class MainWindow(QMainWindow, WindowMixin):
         showInfo = action('info', self.showInfoDialog, None, 'help', 'info')
 
         addActions(self.menus.help,  (help,showInfo)) 
+        
         self.scroll = QScrollArea()
         self.scroll.setWidget(self.canvas)
         self.scroll.setWidgetResizable(True)  
         self.setCentralWidget(self.scroll)
+
+
+        self.scalers = {
+            self.FIT_WINDOW: self.scaleFitWindow,
+            self.FIT_WIDTH: self.scaleFitWidth,
+            # Set to one to scale to 100% when loading files.
+            self.MANUAL_ZOOM: lambda: 1,
+        }
+
+        self.zoomMode = self.MANUAL_ZOOM
         
+        zoomIn = action( 'zoomin' , partial(self.addZoom, 10),
+                        'Ctrl++', 'zoom-in', 'zoominDetail' , enabled=False)
+        zoomOut = action( 'zoomout' , partial(self.addZoom, -10),
+                         'Ctrl+-', 'zoom-out',  'zoomoutDetail', enabled=False)
+        zoomOrg = action( 'originalsize' , partial(self.setZoom, 100),
+                         'Ctrl+=', 'zoom',  'originalsizeDetail' , enabled=False)
+        fitWindow = action( 'fitWin' , self.setFitWindow,
+                           'Ctrl+F', 'fit-window',  'fitWinDetail' ,
+                           checkable=True, enabled=False)
+        fitWidth = action( 'fitWidth' , self.setFitWidth,
+                          'Ctrl+Shift+F', 'fit-width',  'fitWidthDetail' ,
+                          checkable=True, enabled=False)
+
+
+        self.zoomWidget = ZoomWidget()
+
+        zoom = QWidgetAction(self)
+        zoom.setDefaultWidget(self.zoomWidget)
+        self.zoomWidget.setWhatsThis(
+            u"Zoom in or out of the image. Also accessible with"
+            " %s and %s from the canvas." % (fmtShortcut("Ctrl+[-+]"),
+                                             fmtShortcut("Ctrl+Wheel")))
+   
+
+        zoomActions = (self.zoomWidget, zoomIn, zoomOut,
+                       zoomOrg, fitWindow, fitWidth)
+        
+        addActions(self.menus.view, ( 
+            zoomIn, zoomOut, zoomOrg,
+            fitWindow, fitWidth))
+
+        
+        # Callbacks:
+        self.zoomWidget.valueChanged.connect(self.paintCanvas)
+
+        self.actions = struct(save=save,   saveAs=saveAs, open=open,    zoom=zoom, zoomIn=zoomIn, zoomOut=zoomOut, zoomOrg=zoomOrg,
+                              fitWindow=fitWindow, fitWidth=fitWidth,
+                              zoomActions=zoomActions)
+        
+    
+    def scaleFitWindow(self):
+        """Figure out the size of the pixmap in order to fit the main widget."""
+        e = 2.0  # So that no scrollbars are generated.
+        w1 = self.centralWidget().width() - e
+        h1 = self.centralWidget().height() - e
+        a1 = w1 / h1
+        # Calculate a new scale value based on the pixmap's aspect ratio.
+        w2 = self.canvas.pixmap.width() - 0.0
+        h2 = self.canvas.pixmap.height() - 0.0
+        a2 = w2 / h2
+        return w1 / w2 if a2 >= a1 else h1 / h2
+    
+    def scaleFitWidth(self):
+        # The epsilon does not seem to work too well here.
+        w = self.centralWidget().width() - 2.0
+        return w / self.canvas.pixmap.width()
+
+    def setFitWindow(self, value=True):
+        if value:
+            self.actions.fitWidth.setChecked(False)
+        self.zoomMode = self.FIT_WINDOW if value else self.MANUAL_ZOOM
+        self.adjustScale()
+    
+    def setFitWidth(self, value=True):
+        if value:
+            self.actions.fitWindow.setChecked(False)
+        self.zoomMode = self.FIT_WIDTH if value else self.MANUAL_ZOOM
+        self.adjustScale()
+
     def openFile(self, _value=False): 
         path = os.path.dirname(self.filePath) if self.filePath else '.'
         formats = ['*.%s' % fmt.data().decode("ascii").lower() for fmt in QImageReader.supportedImageFormats()] 
@@ -99,21 +185,47 @@ class MainWindow(QMainWindow, WindowMixin):
             print("Loaded %s" % os.path.basename(filePath))
             self.image = image
             self.filePath = filePath  
-            self.pixmap =QPixmap.fromImage(image)
+            self.pixmap = QPixmap.fromImage(image)
             
             self.canvas.setEnabled(True)
             self.canvas.loadPixmap(self.pixmap)
             #写到这里 还没写canvas 
+            
+            self.adjustScale(initial=True)
             self.paintCanvas() 
-            print("paintCanvas()")
+            self.toggleActions(True)
+
+    def toggleActions(self, value=True):
+        """Enable/Disable widgets which depend on an opened image."""
+        for z in self.actions.zoomActions:
+            z.setEnabled(value) 
+            print("enabled")
+
+    def setZoom(self, value):
+        self.actions.fitWidth.setChecked(False)
+        self.actions.fitWindow.setChecked(False)
+        self.zoomMode = self.MANUAL_ZOOM
+        self.zoomWidget.setValue(value)
+
+    def addZoom(self, increment=10):
+        self.setZoom(self.zoomWidget.value() + increment)
 
 
-
+    def resizeEvent(self, event):
+        if self.canvas and not self.image.isNull() and self.zoomMode != self.MANUAL_ZOOM:
+            self.adjustScale()
+        super(MainWindow, self).resizeEvent(event)
 
     def paintCanvas(self):
-        assert not self.image.isNull(), "cannot paint null image"  
+        assert not self.image.isNull(), "cannot paint null image"   
+        self.canvas.scale = 0.01 * self.zoomWidget.value() 
+        self.canvas.adjustSize()
         self.canvas.update()
 
+    
+    def adjustScale(self, initial=False):
+        value = self.scalers[self.FIT_WINDOW if initial else self.zoomMode]()
+        self.zoomWidget.setValue(int(100 * value))
 
  
     def saveFile(self, _value=False):
