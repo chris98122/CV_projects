@@ -1,5 +1,3 @@
- 
-
 import sys
 #PyQt5中使用的基本控件都在PyQt5.QtWidgets模块中
 from PyQt5.QtWidgets import QApplication, QMainWindow
@@ -14,12 +12,14 @@ import subprocess
 from canvas import Canvas
 from zoomWidget import ZoomWidget
 from functools import partial
-
+ 
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
-from PyQt5.QtCore import *
-#导入designer工具生成的login模块 
+from PyQt5.QtCore import * 
 
+from filters import *
+
+import numpy as np
 __appname__="project 1 by chris"
 class WindowMixin(object):
 
@@ -71,7 +71,7 @@ class MainWindow(QMainWindow, WindowMixin):
 
         
         addActions(self.menus.file,
-                   (open, save, saveAs ))
+                   (open, None ))
 
         help = action( 'tutorial' , self.showTutorialDialog, None, 'help',  'tutorialDetail' )
         showInfo = action('info', self.showInfoDialog, None, 'help', 'info')
@@ -128,6 +128,25 @@ class MainWindow(QMainWindow, WindowMixin):
                         None, 'Roberts operator', 'Roberts operator',
                         enabled=False)
 
+        Prewitt = action('Prewitt operator', self.Prewitt_op,
+                        None, 'Prewitt operator','Prewitt operator',
+                        enabled=False)
+        
+        Sobel = action('Sobel  operator', self.Sobel_op,
+                        None, 'Sobel operator','Sobel operator',
+                        enabled=False)
+
+        Gaussian = action(' Gaussian filter', self.Gaussian_filter,
+                        None, 'Gaussian filter','Gaussian filter',
+                        enabled=False)
+
+        mean =action(' mean filter', self.mean_filter,
+                        None, 'mean filter','mean filter',
+                        enabled=False)
+        Median =action(' Median  filter', self.Median_filter,
+                        None, 'Median  filter','Median  filter',
+                        enabled=False)
+
         # Callbacks:
         self.zoomWidget.valueChanged.connect(self.paintCanvas)
 
@@ -135,42 +154,139 @@ class MainWindow(QMainWindow, WindowMixin):
                               fitWindow=fitWindow, fitWidth=fitWidth,
                               zoomActions=zoomActions,
                                 onLoadActive=(
-                                Roberts,Roberts))
+                                Roberts,Prewitt,Sobel,  Gaussian, mean, Median))
         
         self.RobertsButton = QToolButton()
         self.RobertsButton.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
-        self.RobertsButton.setText('Roberts operator')
-
-       
+        self.RobertsButton.setText('Roberts operator') 
         self.RobertsButton.setDefaultAction(Roberts)
 
+        self.PrewittButton = QToolButton()
+        self.PrewittButton.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
+        self.PrewittButton.setText('Prewitt operator') 
+        self.PrewittButton.setDefaultAction(Prewitt)
+
+        self.SobelButton = QToolButton()
+        self.SobelButton.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
+        self.SobelButton.setText('Sobel operator') 
+        self.SobelButton.setDefaultAction(Sobel)
+
+        # button templete
+        self.GaussianButton = QToolButton()
+        self.GaussianButton.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
+        self.GaussianButton.setText('Gaussian filter') 
+        self.GaussianButton.setDefaultAction(Gaussian)
+
+        
+        self.meanButton = QToolButton()
+        self.meanButton.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
+        self.meanButton.setText('mean filter') 
+        self.meanButton.setDefaultAction(mean)
+
+        
+        self.MedianButton = QToolButton()
+        self.MedianButton.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
+        self.MedianButton.setText('Median filter') 
+        self.MedianButton.setDefaultAction(Median)
        
         listLayout = QVBoxLayout()
         listLayout.setContentsMargins(0, 0, 0, 0)
         listLayout.addWidget(self.RobertsButton)
+        listLayout.addWidget(self.PrewittButton)
+        listLayout.addWidget( self.SobelButton)
+        listLayout.addWidget( self.GaussianButton )
+        listLayout.addWidget( self.meanButton)
+        listLayout.addWidget(   self.MedianButton)
         
         
         buttonListContainer = QWidget()
         buttonListContainer.setLayout(listLayout)
 
+        
+        self.kernel_text = QLineEdit(self)
+        self.kernel_text.textChanged[str].connect(self.kernel_text_OnChanged) 
+
+
+        self.sigma_text = QLineEdit(self)
+        self.sigma_text.textChanged[str].connect(self.sigma_text_OnChanged)
+         
+  
+        listLayout.addWidget(  self.sigma_text) 
+
+        
+        listLayout.setAlignment(Qt.AlignTop)
+
         self.dock = QDockWidget('filters', self)
         self.dock.setObjectName('filters')
         self.dock.setWidget(buttonListContainer)
         
-        self.dockFeatures = QDockWidget.DockWidgetClosable | QDockWidget.DockWidgetFloatable
+        self.dockFeatures = QDockWidget.DockWidgetClosable  | QDockWidget.DockWidgetFloatable 
         self.dock.setFeatures(self.dock.features() ^ self.dockFeatures)
-        
+
+
         self.addDockWidget(Qt.RightDockWidgetArea, self.dock)
+  
+  
+        listLayout.addWidget(  QLabel("kernel size"))  
+        
+        listLayout.addWidget(  self.kernel_text)  
+        listLayout.addWidget(  QLabel("sigma size"))   
+        listLayout.addWidget(  self.sigma_text)
+          
+        self.arr = None
+        self.kernel_size = 1
+        self.sigma = 1
 
 
+
+    def kernel_text_OnChanged(self,text):
+        # add text to selected shape
+        if int(text) is not None:
+            self.kernel_size =  int(text)
+            print("set kernel size to",text)
+
+    def sigma_text_OnChanged(self,text):
+        # add text to selected shape
+        if int(text) is not None:
+            self.sigma = int(text)
+            print("set sigma  to",text)
     
     def setDirty(self):
-        self.dirty = True
-        self.actions.save.setEnabled(True)
+        self.dirty = True 
 
     def Roberts_op(self):
-        print("roberts op")
-        self.setDirty()
+        print("roberts op") 
+        # do the roberts operation
+        self.arr = np.zeros( self.arr.shape, np.int8)  
+
+        self.update_canvas(self.arr)
+
+    def update_canvas(self,arr):
+        qimg  = get_QImage_by_numpy(arr)
+        self.pixmap = QPixmap.fromImage(qimg)
+        self.canvas.setEnabled(True)
+        self.canvas.loadPixmap(self.pixmap)   
+        self.adjustScale(initial=True)
+        self.paintCanvas()  
+
+
+    def Prewitt_op(self):
+        print("Prewitt_op")
+
+    def Sobel_op(self): 
+        print("Sobel_op")
+
+    def Gaussian_filter(self):
+        self.arr = Gaussian_filter_implement(self.kernel)
+        
+        self.update_canvas(self.arr)
+        print("Gausian filter") 
+
+    def mean_filter(self):
+        print(" mean_filter") 
+
+    def Median_filter(self):
+        print(" Median_filter")
 
     def scaleFitWindow(self):
         """Figure out the size of the pixmap in order to fit the main widget."""
@@ -216,8 +332,9 @@ class MainWindow(QMainWindow, WindowMixin):
         filePath = os.path.abspath(filePath)    
         
         if filePath and os.path.exists(filePath):
-            self.imageData = read(filePath, None)    
-            image = QImage.fromData(self.imageData)
+            self.imageData = read(filePath, None)     
+            image = QImage.fromData(self.imageData ) 
+            
             if image.isNull():
                 self.errorMessage(u'Error opening file',
                                 u"<p>Make sure <i>%s</i> is a valid image file." %   filePath)
@@ -228,14 +345,16 @@ class MainWindow(QMainWindow, WindowMixin):
             self.image = image
             self.filePath = filePath  
             self.pixmap = QPixmap.fromImage(image)
-            
+             
             self.canvas.setEnabled(True)
-            self.canvas.loadPixmap(self.pixmap)
-            #写到这里 还没写canvas 
-            
+            self.canvas.loadPixmap(self.pixmap)   
             self.adjustScale(initial=True)
             self.paintCanvas() 
             self.toggleActions(True)
+
+            self.arr = get_img_numpy(filePath)
+ 
+             
 
     def toggleActions(self, value=True):
         """Enable/Disable widgets which depend on an opened image."""

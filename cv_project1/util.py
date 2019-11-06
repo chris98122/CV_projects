@@ -2,12 +2,16 @@
 import hashlib
 import re
 import sys
-
+from PyQt5 import  QtGui
 from PyQt5.QtGui import *
 from PyQt5.QtWidgets import *
 from PyQt5.QtCore import * 
 
- 
+import copy
+import numpy as np
+
+
+from PIL import Image 
 
 def newIcon(icon):
     return QIcon(':/' + icon)
@@ -51,12 +55,8 @@ def addActions(widget, actions):
         elif isinstance(action, QMenu):
             widget.addMenu(action)
         else:
-            widget.addAction(action)
-
-
-def labelValidator():
-    return QRegExpValidator(QRegExp(r'^[^ \t].+'), None)
-
+            widget.addAction(action) 
+ 
 
 class struct(object):
 
@@ -97,3 +97,13 @@ def natural_sort(list, key=lambda s:s):
         return lambda s: [convert(c) for c in re.split('([0-9]+)', key(s))]
     sort_key = get_alphanum_key_func(key)
     list.sort(key=sort_key)
+
+
+def get_img_numpy(filePath):
+    img = Image.open(filePath)
+    arr = np.array(img)     # 将PIL格式图片转为numpy格式
+    return arr
+
+def get_QImage_by_numpy(img2):
+    image = QtGui.QImage(img2[:],img2.shape[1], img2.shape[0],img2.shape[1] * 3, QtGui.QImage.Format_RGB888)
+    return image
