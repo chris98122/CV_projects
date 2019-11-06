@@ -8,7 +8,7 @@ from PyQt5 import QtWidgets
 import os.path
 import platform
 import subprocess
-
+import time, threading
 from canvas import Canvas
 from zoomWidget import ZoomWidget
 from functools import partial
@@ -21,6 +21,28 @@ from filters import *
 
 import numpy as np
 __appname__="project 1 by chris"
+
+class filter_thread(QThread):
+    use_filter = pyqtSignal( QPixmap)     
+    def __init__(self,kernel_size,sigma ,filter,arr ):
+        super().__init__()
+        self.kernel_size=kernel_size
+        self.sigma =sigma
+        self.type = filter
+        self.arr =arr
+
+    def __del__(self):
+        self.wait()
+
+    def run(self):
+        if self.type is "gaussian":
+            arr =  Gaussian_filter_implement(self.kernel_size,self.sigma,self.arr)
+            qimg = get_QImage_by_numpy(arr)
+            pixmap =  QPixmap.fromImage(qimg)  
+            self.use_filter.emit(pixmap)      
+        
+ 
+
 class WindowMixin(object):
 
     def menu(self, title, actions=None):
@@ -33,7 +55,7 @@ class WindowMixin(object):
 class MainWindow(QMainWindow, WindowMixin):
     
     FIT_WINDOW, FIT_WIDTH, MANUAL_ZOOM = list(range(3))
-
+     
     def __init__(self, parent=None): 
         super(MainWindow, self).__init__()
         self.setWindowTitle(__appname__)
@@ -176,8 +198,7 @@ class MainWindow(QMainWindow, WindowMixin):
         self.GaussianButton.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
         self.GaussianButton.setText('Gaussian filter') 
         self.GaussianButton.setDefaultAction(Gaussian)
-
-        
+ 
         self.meanButton = QToolButton()
         self.meanButton.setToolButtonStyle(Qt.ToolButtonTextBesideIcon)
         self.meanButton.setText('mean filter') 
@@ -234,9 +255,10 @@ class MainWindow(QMainWindow, WindowMixin):
         listLayout.addWidget(  self.sigma_text)
           
         self.arr = None
-        self.kernel_size = 1
+        self.kernel_size = 5
         self.sigma = 1
-
+        self.thread = None
+  
 
 
     def kernel_text_OnChanged(self,text):
@@ -258,16 +280,13 @@ class MainWindow(QMainWindow, WindowMixin):
         print("roberts op") 
         # do the roberts operation
         self.arr = np.zeros( self.arr.shape, np.int8)  
+ 
 
-        self.update_canvas(self.arr)
-
-    def update_canvas(self,arr):
-        qimg  = get_QImage_by_numpy(arr)
-        self.pixmap = QPixmap.fromImage(qimg)
-        self.canvas.setEnabled(True)
-        self.canvas.loadPixmap(self.pixmap)   
-        self.adjustScale(initial=True)
-        self.paintCanvas()  
+    def update_pixmap(self,pixmap): 
+        
+        self.toggleActions(True)
+        self.pixmap =pixmap
+        self.canvas.loadPixmap(self.pixmap)
 
 
     def Prewitt_op(self):
@@ -276,11 +295,13 @@ class MainWindow(QMainWindow, WindowMixin):
     def Sobel_op(self): 
         print("Sobel_op")
 
-    def Gaussian_filter(self):
-        self.arr = Gaussian_filter_implement(self.kernel)
+    def Gaussian_filter(self):  
+        self.thread = filter_thread(self.kernel_size,self.sigma,"gaussian",self.arr)
+        self.thread.use_filter.connect(self.update_pixmap)
+        self.thread.start()    # 启动线程 
         
-        self.update_canvas(self.arr)
-        print("Gausian filter") 
+        self.toggleActions(False)
+        print("Gausian filter")  
 
     def mean_filter(self):
         print(" mean_filter") 

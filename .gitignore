@@ -1,2 +1,5 @@
 
 *.pyc
+cv_project1/.vscode/launch.json
+cv_project1/.vscode/settings.json
+cv_project1/lena.jpg

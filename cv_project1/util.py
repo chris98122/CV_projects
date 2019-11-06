@@ -101,9 +101,12 @@ def natural_sort(list, key=lambda s:s):
 
 def get_img_numpy(filePath):
     img = Image.open(filePath)
-    arr = np.array(img)     # 将PIL格式图片转为numpy格式
+    arr = np.array(img)
     return arr
 
-def get_QImage_by_numpy(img2):
-    image = QtGui.QImage(img2[:],img2.shape[1], img2.shape[0],img2.shape[1] * 3, QtGui.QImage.Format_RGB888)
+def get_QImage_by_numpy(arr):
+
+    from PIL import Image, ImageQt
+    image = Image.fromarray(np.uint8(arr))
+    image= ImageQt.ImageQt(image) 
     return image
