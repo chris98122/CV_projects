@@ -110,3 +110,6 @@ def get_QImage_by_numpy(arr):
     image = Image.fromarray(np.uint8(arr))
     image= ImageQt.ImageQt(image) 
     return image
+
+def get_PIL_by_numpy(arr):
+    return Image.fromarray(arr.astype('uint8')).convert('RGB')

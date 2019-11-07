@@ -20,13 +20,16 @@ class Canvas(QWidget):
         self.scale = 1.0
     
     def loadPixmap(self, pixmap):
-        self.pixmap = pixmap
-        self.repaint() 
-        print("repaint")
+        try: 
+            self.pixmap = pixmap
+            self.update() 
+        except:
+            print("Unexpected error:", sys.exc_info()[0])
+            raise
+        
 
     
-    def paintEvent(self, event):
-        print("paint event")
+    def paintEvent(self, event): 
         if not self.pixmap:
             return super(Canvas, self).paintEvent(event)
 
