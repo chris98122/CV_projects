@@ -129,3 +129,23 @@ def mean_filter_implement(kernel_len,arr):
             
     result = minus_padding(pad,x,y,  mean_arr) 
     return result 
+
+def median_filter_implement(kernel_len,arr):
+    print("median_filter_implement")  
+
+    x=arr.shape[0]
+    y=arr.shape[1] 
+
+    pad = kernel_len 
+    arr = add_padding(pad,arr)  
+    mean_arr =  np.zeros(arr.shape)  
+
+    for i in range( arr.shape[0] - kernel_len):
+        for j in range( arr.shape[1] - kernel_len):   
+            mean_arr [i, j, 0] =  np.median ( arr[i:i+kernel_len, j:j+kernel_len, 0]  ) 
+            mean_arr [i, j, 1] = np.median   ( arr[i:i+kernel_len, j:j+kernel_len, 1]   )  
+            mean_arr[i, j, 2] =  np.median   ( arr[i:i+kernel_len, j:j+kernel_len, 2]  ) 
+
+            
+    result = minus_padding(pad,x,y,  mean_arr) 
+    return result 

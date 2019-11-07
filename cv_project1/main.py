@@ -67,6 +67,10 @@ class PhotoFilter(QWidget):
         mean.triggered.connect(self.mean_filter)
 
 
+        median= QAction('median filter', self) 
+        median.setStatusTip('median filter')
+        median.triggered.connect(self.Median_filter)
+
         menubar = QMenuBar()
         fileMenu = menubar.addMenu('&File')
         filterMenu = menubar.addMenu('&Filters')
@@ -77,6 +81,7 @@ class PhotoFilter(QWidget):
         filterMenu.addAction(Sobel) 
         filterMenu.addAction(Prewitt )
         filterMenu.addAction(mean)
+        filterMenu.addAction(median)
         hbox.setMenuBar(menubar)
             
         self.arr = None
@@ -163,7 +168,8 @@ class PhotoFilter(QWidget):
 
 
     def Median_filter(self):
-        print(" Median_filter")
+        self.filter_implement(median_filter_implement,self.fname,self.kernel_size)
+
 
     def Roberts_op(self): 
         self.filter_implement(Roberts_op_implement,self.fname)
