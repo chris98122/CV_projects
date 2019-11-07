@@ -49,14 +49,18 @@ class PhotoFilter(QWidget):
         Gaussian.triggered.connect(self.Gaussian_filter)
  
         Prewitt = QAction('Prewitt_operation', self) 
-        Prewitt.setStatusTip('Gaussian filter')
+        Prewitt.setStatusTip('prewitt op')
         Prewitt.triggered.connect(self. Prewitt_op)
 
         
-        Roberts = QAction(' Roberts_operation', self) 
+        Roberts = QAction('Roberts operation', self) 
         Roberts.setStatusTip('Roberts_operation')
         Roberts.triggered.connect(self. Roberts_op)
 
+        
+        Sobel = QAction('Sobel operation', self) 
+        Sobel.setStatusTip('Roberts_operation')
+        Sobel.triggered.connect(self. Sobel_op)
 
         menubar = QMenuBar()
         fileMenu = menubar.addMenu('&File')
@@ -64,8 +68,9 @@ class PhotoFilter(QWidget):
         fileMenu.addAction(openFile)
         fileMenu.addAction(saveFile)
         filterMenu.addAction(Gaussian)  
-        filterMenu.addAction(Roberts) 
-        filterMenu.addAction(  Prewitt )
+        filterMenu.addAction(Roberts)
+        filterMenu.addAction(Sobel) 
+        filterMenu.addAction(Prewitt )
         hbox.setMenuBar(menubar)
             
         self.arr = None
@@ -145,7 +150,7 @@ class PhotoFilter(QWidget):
         print("Prewitt_op")
 
     def Sobel_op(self): 
-        print("Sobel_op")
+        self.filter_implement(Sobel_op_implement,self.fname)
  
     def mean_filter(self):
         print(" mean_filter") 

@@ -1,5 +1,6 @@
 
 import numpy as np
+import math
 
 def Gaussian_filter_implement(kernel_len,sigma,arr): 
     gaus_filter = Gaussian_filter(kernel_len,sigma)
@@ -37,8 +38,7 @@ def Gaussian_filter(n, sigma):
 
 def Roberts_op_implement(arr): 
     print("Roberts_op")
-    R1 = np.array([[1, 0], [0, -1]], np.float32)
-
+    R1 = np.array([[1, 0], [0, -1]], np.float32) 
     R2 = np.array([[0, 1], [-1, 0]], np.float32)
 
     
@@ -58,3 +58,28 @@ def Roberts_op_implement(arr):
 
     result = minus_padding(pad,x,y,   sharp_arr ) 
     return result
+
+
+def Sobel_op_implement(arr):
+    
+    print("Sobel_op")
+    R1 = np.array([[-1,-2,-1], [0,0,0],[1,2,1]], np.float32) 
+    R2 = np.array([[-1,0,1], [-2,0,2],[-1,0,1]], np.float32)
+
+    x=arr.shape[0]
+    y=arr.shape[1] 
+
+    pad = 2 
+    arr = add_padding(pad,arr)  
+    sharp_arr =  np.zeros(arr.shape) 
+
+    for i in range( arr.shape[0] - 3):
+        for j in range( arr.shape[1] - 3): 
+            sharp_arr [i, j, 0] =  math.sqrt( pow( (arr[i:i+3, j:j+3, 0]*R1).sum(),2 ) + pow( (arr[i:i+3, j:j+3, 0]*R2).sum(),2 ) )
+            sharp_arr [i, j, 1] =  math.sqrt(pow( (arr[i:i+3, j:j+3, 1]*R1).sum(),2 ) + pow( (arr[i:i+3, j:j+3, 1]*R2).sum(),2 ) )
+            sharp_arr [i, j, 2] =  math.sqrt(pow( (arr[i:i+3, j:j+3, 2]*R1).sum() ,2) + pow( (arr[i:i+3, j:j+3, 2]*R2).sum(),2 ) )
+
+
+    result = minus_padding(pad,x,y,   sharp_arr ) 
+    return result
+ 
