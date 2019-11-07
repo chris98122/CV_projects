@@ -51,10 +51,9 @@ def Roberts_op_implement(arr):
 
     for i in range( arr.shape[0] - 2):
         for j in range( arr.shape[1] - 2): 
-            sharp_arr [i, j, 0] = abs( (arr[i:i+2, j:j+2, 0]*R1).sum() ) + abs( (arr[i:i+2, j:j+2, 0]*R2).sum() ) 
-            sharp_arr [i, j, 1] = abs( (arr[i:i+2, j:j+2, 1]*R1).sum() ) + abs( (arr[i:i+2, j:j+2, 1]*R2).sum() ) 
-            sharp_arr [i, j, 2] = abs( (arr[i:i+2, j:j+2, 2]*R1).sum() ) + abs( (arr[i:i+2, j:j+2, 2]*R2).sum() ) 
- 
+            sharp_arr [i, j, 0] =  abs( (arr[i:i+2, j:j+2, 0]*R1).sum() )  +abs( (arr[i:i+2, j:j+2, 0]*R2).sum() )   
+            sharp_arr [i, j, 1] =   abs( (arr[i:i+2, j:j+2, 1]*R1).sum() )  +abs( (arr[i:i+2, j:j+2, 1]*R2).sum() )  
+            sharp_arr [i, j, 2] =    abs( (arr[i:i+2, j:j+2, 2]*R1).sum() )  +abs( (arr[i:i+2, j:j+2, 2]*R2).sum() )   
 
     result = minus_padding(pad,x,y,   sharp_arr ) 
     return result
@@ -75,11 +74,37 @@ def Sobel_op_implement(arr):
 
     for i in range( arr.shape[0] - 3):
         for j in range( arr.shape[1] - 3): 
-            sharp_arr [i, j, 0] =  math.sqrt( pow( (arr[i:i+3, j:j+3, 0]*R1).sum(),2 ) + pow( (arr[i:i+3, j:j+3, 0]*R2).sum(),2 ) )
-            sharp_arr [i, j, 1] =  math.sqrt(pow( (arr[i:i+3, j:j+3, 1]*R1).sum(),2 ) + pow( (arr[i:i+3, j:j+3, 1]*R2).sum(),2 ) )
-            sharp_arr [i, j, 2] =  math.sqrt(pow( (arr[i:i+3, j:j+3, 2]*R1).sum() ,2) + pow( (arr[i:i+3, j:j+3, 2]*R2).sum(),2 ) )
+            sharp_arr [i, j, 0] =   abs( (arr[i:i+3, j:j+3, 0]*R1).sum() )+abs( (arr[i:i+3, j:j+3, 0]*R2).sum() )  
+            sharp_arr [i, j, 1] =    abs( (arr[i:i+3, j:j+3, 0]*R1).sum() ) +abs( (arr[i:i+3, j:j+3, 1]*R2).sum() )  
+            sharp_arr [i, j, 2] =    abs( (arr[i:i+3, j:j+3, 0]*R1).sum() ) +abs( (arr[i:i+3, j:j+3, 2]*R2).sum() )   
 
 
     result = minus_padding(pad,x,y,   sharp_arr ) 
     return result
- 
+
+def Prewitt_op_implement(arr):
+    print("Prewitt_op")
+    R1 = np.array([[-1, 0, 1],
+                      [-1, 0, 1],
+                      [-1, 0, 1]])
+    R2 = np.array([[-1,-1,-1],
+                      [ 0, 0, 0],
+                      [ 1, 1, 1]])
+
+
+    x=arr.shape[0]
+    y=arr.shape[1] 
+
+    pad = 2 
+    arr = add_padding(pad,arr)  
+    sharp_arr =  np.zeros(arr.shape) 
+
+    for i in range( arr.shape[0] - 3):
+        for j in range( arr.shape[1] - 3): 
+            sharp_arr [i, j, 0] =   abs( (arr[i:i+3, j:j+3, 0]*R1).sum() )+abs( (arr[i:i+3, j:j+3, 0]*R2).sum() )  
+            sharp_arr [i, j, 1] =    abs( (arr[i:i+3, j:j+3, 0]*R1).sum() ) +abs( (arr[i:i+3, j:j+3, 1]*R2).sum() )  
+            sharp_arr [i, j, 2] =    abs( (arr[i:i+3, j:j+3, 0]*R1).sum() ) +abs( (arr[i:i+3, j:j+3, 2]*R2).sum() )   
+
+
+    result = minus_padding(pad,x,y,   sharp_arr ) 
+    return result    

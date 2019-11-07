@@ -147,7 +147,8 @@ class PhotoFilter(QWidget):
 
 
     def Prewitt_op(self):
-        print("Prewitt_op")
+        
+        self.filter_implement(Prewitt_op_implement,self.fname)
 
     def Sobel_op(self): 
         self.filter_implement(Sobel_op_implement,self.fname)
