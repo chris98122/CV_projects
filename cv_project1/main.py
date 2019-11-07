@@ -48,6 +48,10 @@ class PhotoFilter(QWidget):
         Gaussian.setStatusTip('Gaussian filter')
         Gaussian.triggered.connect(self.Gaussian_filter)
  
+        Prewitt = QAction('Prewitt_operation', self) 
+        Prewitt.setStatusTip('Gaussian filter')
+        Prewitt.triggered.connect(self. Prewitt_op)
+
 
         menubar = QMenuBar()
         fileMenu = menubar.addMenu('&File')
@@ -55,13 +59,13 @@ class PhotoFilter(QWidget):
         fileMenu.addAction(openFile)
         fileMenu.addAction(saveFile)
         filterMenu.addAction(Gaussian) 
+        filterMenu.addAction(  Prewitt )
         hbox.setMenuBar(menubar)
             
         self.arr = None
         self.kernel_size = 5
         self.sigma = 1
-
-        listLayout = QVBoxLayout()
+ 
         self.kernel_text = QLineEdit(self)
         self.kernel_text.textChanged[str].connect(self.kernel_text_OnChanged) 
 
@@ -140,6 +144,19 @@ class PhotoFilter(QWidget):
             im = get_PIL_by_numpy(arr)
             
             self.show_file(im)
+
+
+    def Prewitt_op(self):
+        print("Prewitt_op")
+
+    def Sobel_op(self): 
+        print("Sobel_op")
+ 
+    def mean_filter(self):
+        print(" mean_filter") 
+
+    def Median_filter(self):
+        print(" Median_filter")
 
  
 
