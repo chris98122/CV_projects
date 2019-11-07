@@ -52,13 +52,19 @@ class PhotoFilter(QWidget):
         Prewitt.setStatusTip('Gaussian filter')
         Prewitt.triggered.connect(self. Prewitt_op)
 
+        
+        Roberts = QAction(' Roberts_operation', self) 
+        Roberts.setStatusTip('Roberts_operation')
+        Roberts.triggered.connect(self. Roberts_op)
+
 
         menubar = QMenuBar()
         fileMenu = menubar.addMenu('&File')
         filterMenu = menubar.addMenu('&Filters')
         fileMenu.addAction(openFile)
         fileMenu.addAction(saveFile)
-        filterMenu.addAction(Gaussian) 
+        filterMenu.addAction(Gaussian)  
+        filterMenu.addAction(Roberts) 
         filterMenu.addAction(  Prewitt )
         hbox.setMenuBar(menubar)
             
@@ -131,19 +137,8 @@ class PhotoFilter(QWidget):
 
         self.screen_print(fn)
 
-    def Gaussian_filter(self):
-        if self.fname:
-            im = Image.open(self.fname)
-            if im.mode != 'RGB':
-                im = im.convert('RGB')
-
-            x, y = im.size
-            arr = np.array(im)
-
-            arr = Gaussian_filter_implement(self.kernel_size,self.sigma,arr) 
-            im = get_PIL_by_numpy(arr)
-            
-            self.show_file(im)
+    def Gaussian_filter(self): 
+        self.filter_implement(Gaussian_filter_implement,self.fname,self.kernel_size,self.sigma) 
 
 
     def Prewitt_op(self):
@@ -158,7 +153,25 @@ class PhotoFilter(QWidget):
     def Median_filter(self):
         print(" Median_filter")
 
- 
+    def Roberts_op(self): 
+        self.filter_implement(Roberts_op_implement,self.fname)
+
+    def filter_implement(self,funct,fname,*args): 
+        if self.fname:
+            im = Image.open(self.fname)
+            if im.mode != 'RGB':
+                im = im.convert('RGB')
+
+            x, y = im.size
+            arr = np.array(im)
+            if args is None:
+                arr = funct(arr) 
+            else:
+                arr = funct(*args,arr) 
+            im = get_PIL_by_numpy(arr)
+            
+            self.show_file(im)
+
 
     def kernel_text_OnChanged(self,text):
         # add text to selected shape

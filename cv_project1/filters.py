@@ -35,4 +35,9 @@ def Gaussian_filter(n, sigma):
     gaus_filter = (1/(2*np.pi*np.square(sigma)))*np.exp(-gaus_filter/(2*np.square(sigma)))
     return gaus_filter
 
- 
+
+def Roberts_op_implement(arr):
+    print(arr)
+    print("Roberts_op")
+    R1 = np.array([[1, 0], [0, -1]], np.float32)
+    return arr
