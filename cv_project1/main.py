@@ -44,30 +44,35 @@ class PhotoFilter(QWidget):
         saveFile.triggered.connect(self.save_file)
 
         Gaussian = QAction('Gaussian filter', self)
-        Gaussian.setShortcut('ctrl+L')
+        Gaussian.setShortcut('ctrl+G')
         Gaussian.setStatusTip('Gaussian filter')
         Gaussian.triggered.connect(self.Gaussian_filter)
  
         Prewitt = QAction('Prewitt_operation', self) 
+        Prewitt.setShortcut('ctrl+P')
         Prewitt.setStatusTip('prewitt op')
         Prewitt.triggered.connect(self. Prewitt_op)
 
         
         Roberts = QAction('Roberts operation', self) 
+        Roberts .setShortcut('ctrl+R')
         Roberts.setStatusTip('Roberts_operation')
         Roberts.triggered.connect(self. Roberts_op)
 
         
-        Sobel = QAction('Sobel operation', self) 
+        Sobel = QAction('Sobel operation', self)  
+        Sobel.setShortcut('ctrl+L')
         Sobel.setStatusTip('sobel operation')
         Sobel.triggered.connect(self. Sobel_op)
 
-        mean= QAction('mean filter', self) 
+        mean= QAction('mean filter', self)
+        mean.setShortcut('ctrl+M') 
         mean.setStatusTip('mean_filter')
         mean.triggered.connect(self.mean_filter)
 
 
         median= QAction('median filter', self) 
+        median.setShortcut('ctrl+N') 
         median.setStatusTip('median filter')
         median.triggered.connect(self.Median_filter)
 
@@ -95,18 +100,21 @@ class PhotoFilter(QWidget):
         self.sigma_text.textChanged[str].connect(self.sigma_text_OnChanged) 
 
         self.kernel_text.setAlignment(Qt.AlignBottom)
+        
+        self.kernel_text.setMaximumWidth(100)
 
         self.ql = QLabel("kernel size")
         self.ql .setAlignment(Qt.AlignBottom) 
-        self.ql.setMaximumHeight(10)
+        self.ql.setMaximumHeight(20)
         hbox.addWidget( self.ql  )  
         
         hbox.addWidget(  self.kernel_text)  
         self.ql2= QLabel("sigma size")
-        self.ql2.setMaximumHeight(10)
+        self.ql2.setMaximumHeight(20)
         self.ql2 .setAlignment(Qt.AlignBottom)
         hbox.addWidget(self.ql2 )   
         self.sigma_text.setAlignment(Qt.AlignBottom)
+        self.sigma_text.setMaximumWidth(100)
         hbox.addWidget(  self.sigma_text)
 
     def eventFilter(self, source, event):
