@@ -68,17 +68,17 @@ def Sobel_op_implement(arr):
     x=arr.shape[0]
     y=arr.shape[1] 
 
-    pad = 2 
+    pad = 3
     arr = add_padding(pad,arr)  
     sharp_arr =  np.zeros(arr.shape) 
 
     for i in range( arr.shape[0] - 3):
-        for j in range( arr.shape[1] - 3): 
-            sharp_arr [i, j, 0] =   abs( (arr[i:i+3, j:j+3, 0]*R1).sum() )+abs( (arr[i:i+3, j:j+3, 0]*R2).sum() )  
-            sharp_arr [i, j, 1] =    abs( (arr[i:i+3, j:j+3, 0]*R1).sum() ) +abs( (arr[i:i+3, j:j+3, 1]*R2).sum() )  
-            sharp_arr [i, j, 2] =    abs( (arr[i:i+3, j:j+3, 0]*R1).sum() ) +abs( (arr[i:i+3, j:j+3, 2]*R2).sum() )   
+        for j in range( arr.shape[1] - 3):  
 
-
+            sharp_arr [i, j, 0] =  math.sqrt(pow( (arr[i:i+3, j:j+3, 0]*R1).sum(),2 ) + pow( (arr[i:i+3, j:j+3, 0]*R2).sum(),2 ) )
+            sharp_arr [i, j, 1] =  math.sqrt(pow( (arr[i:i+3, j:j+3, 1]*R1).sum(),2 ) + pow( (arr[i:i+3, j:j+3, 1]*R2).sum(),2 ) )
+            sharp_arr [i, j, 2] =  math.sqrt(pow( (arr[i:i+3, j:j+3, 2]*R1).sum() ,2) + pow( (arr[i:i+3, j:j+3, 2]*R2).sum(),2 ) )
+    
     result = minus_padding(pad,x,y,   sharp_arr ) 
     return result
 
@@ -95,16 +95,37 @@ def Prewitt_op_implement(arr):
     x=arr.shape[0]
     y=arr.shape[1] 
 
-    pad = 2 
+    pad = 3 
     arr = add_padding(pad,arr)  
     sharp_arr =  np.zeros(arr.shape) 
 
     for i in range( arr.shape[0] - 3):
         for j in range( arr.shape[1] - 3): 
             sharp_arr [i, j, 0] =   abs( (arr[i:i+3, j:j+3, 0]*R1).sum() )+abs( (arr[i:i+3, j:j+3, 0]*R2).sum() )  
-            sharp_arr [i, j, 1] =    abs( (arr[i:i+3, j:j+3, 0]*R1).sum() ) +abs( (arr[i:i+3, j:j+3, 1]*R2).sum() )  
-            sharp_arr [i, j, 2] =    abs( (arr[i:i+3, j:j+3, 0]*R1).sum() ) +abs( (arr[i:i+3, j:j+3, 2]*R2).sum() )   
+            sharp_arr [i, j, 1] =    abs( (arr[i:i+3, j:j+3, 1]*R1).sum() ) +abs( (arr[i:i+3, j:j+3, 1]*R2).sum() )  
+            sharp_arr [i, j, 2] =    abs( (arr[i:i+3, j:j+3, 2]*R1).sum() ) +abs( (arr[i:i+3, j:j+3, 2]*R2).sum() )   
 
 
     result = minus_padding(pad,x,y,   sharp_arr ) 
     return result    
+
+
+def mean_filter_implement(kernel_len,arr):
+    print("mean_filter_implement")  
+
+    x=arr.shape[0]
+    y=arr.shape[1] 
+
+    pad = kernel_len 
+    arr = add_padding(pad,arr)  
+    mean_arr =  np.zeros(arr.shape)  
+
+    for i in range( arr.shape[0] - kernel_len):
+        for j in range( arr.shape[1] - kernel_len):   
+            mean_arr [i, j, 0] =   ( arr[i:i+kernel_len, j:j+kernel_len, 0]  ).sum() / pow(kernel_len,2)
+            mean_arr [i, j, 1] =   ( arr[i:i+kernel_len, j:j+kernel_len, 1]   ).sum() / pow(kernel_len,2)
+            mean_arr[i, j, 2] =    ( arr[i:i+kernel_len, j:j+kernel_len, 2]  ).sum() / pow(kernel_len,2)
+
+            
+    result = minus_padding(pad,x,y,  mean_arr) 
+    return result 

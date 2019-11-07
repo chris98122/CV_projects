@@ -59,8 +59,13 @@ class PhotoFilter(QWidget):
 
         
         Sobel = QAction('Sobel operation', self) 
-        Sobel.setStatusTip('Roberts_operation')
+        Sobel.setStatusTip('sobel operation')
         Sobel.triggered.connect(self. Sobel_op)
+
+        mean= QAction('mean filter', self) 
+        mean.setStatusTip('mean_filter')
+        mean.triggered.connect(self.mean_filter)
+
 
         menubar = QMenuBar()
         fileMenu = menubar.addMenu('&File')
@@ -71,6 +76,7 @@ class PhotoFilter(QWidget):
         filterMenu.addAction(Roberts)
         filterMenu.addAction(Sobel) 
         filterMenu.addAction(Prewitt )
+        filterMenu.addAction(mean)
         hbox.setMenuBar(menubar)
             
         self.arr = None
@@ -147,14 +153,14 @@ class PhotoFilter(QWidget):
 
 
     def Prewitt_op(self):
-        
         self.filter_implement(Prewitt_op_implement,self.fname)
 
     def Sobel_op(self): 
         self.filter_implement(Sobel_op_implement,self.fname)
  
     def mean_filter(self):
-        print(" mean_filter") 
+        self.filter_implement(mean_filter_implement,self.fname,self.kernel_size)
+
 
     def Median_filter(self):
         print(" Median_filter")
