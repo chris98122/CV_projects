@@ -14,6 +14,7 @@ def Gaussian_filter_implement(kernel_len,sigma,arr):
     arr = np.pad(arr,  ((pad,pad ),(pad,pad ),(0,0)),"constant", constant_values=(180))
     print(arr.shape)
     
+    
     smooth_arr =  np.zeros(arr.shape)
 
     for i in range( arr.shape[0] - kernel_len):
@@ -21,8 +22,8 @@ def Gaussian_filter_implement(kernel_len,sigma,arr):
             smooth_arr[i, j, 0] = ( arr[i:i+kernel_len, j:j+kernel_len, 0]*gaus_filter).sum() 
             smooth_arr[i, j, 1] = ( arr[i:i+kernel_len, j:j+kernel_len, 1]*gaus_filter).sum() 
             smooth_arr[i, j, 2] = ( arr[i:i+kernel_len, j:j+kernel_len, 2]*gaus_filter).sum() 
-
-    result =  smooth_arr[pad-1:x+pad-1 ,pad-1:y+pad-1 ,0:3]
+ 
+    result =  smooth_arr[pad//2:x+pad//2,pad//2:y+pad//2,0:3]
     print(result.shape)
     return result
  
