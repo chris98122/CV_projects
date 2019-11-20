@@ -53,9 +53,9 @@ class PhotoFilter(QWidget):
         gradient.setStatusTip('Morphological gradient')
         gradient.triggered.connect(self.gradient)
 
-        cond_dilation= QAction('Morphological Reconstruction', self)
+        cond_dilation= QAction('Binary Reconstruction', self)
         cond_dilation.setShortcut('ctrl+N')
-        cond_dilation.setStatusTip('Morphological Reconstruction')
+        cond_dilation.setStatusTip('Binary Reconstruction')
         cond_dilation.triggered.connect(self.cond_dilation)
 
         menubar = QMenuBar()
