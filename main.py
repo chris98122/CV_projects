@@ -49,16 +49,25 @@ class PhotoFilter(QWidget):
         edge.triggered.connect(self.edge)
  
         gradient= QAction('Morphological gradient', self)
-        gradient.setShortcut('ctrl+L')
+        gradient.setShortcut('ctrl+M')
         gradient.setStatusTip('Morphological gradient')
         gradient.triggered.connect(self.gradient)
+
+        cond_dilation= QAction('Morphological Reconstruction', self)
+        cond_dilation.setShortcut('ctrl+N')
+        cond_dilation.setStatusTip('Morphological Reconstruction')
+        cond_dilation.triggered.connect(self.cond_dilation)
 
         menubar = QMenuBar()
         fileMenu = menubar.addMenu('&File')
         filterMenu = menubar.addMenu('&Filters')
         fileMenu.addAction(openFile)
         fileMenu.addAction(saveFile)
-        filterMenu.addAction(edge) 
+
+        filterMenu.addAction(edge)
+        filterMenu.addAction(gradient) 
+        filterMenu.addAction(cond_dilation) 
+        
         hbox.setMenuBar(menubar)
             
         self.arr = None
@@ -135,6 +144,19 @@ class PhotoFilter(QWidget):
             
             self.show_file(im)
 
+    def cond_dilation(self): 
+         if self.fname:
+            im = Image.open(self.fname)
+            if im.mode != 'RGB':
+                im = im.convert('RGB')
+
+            x, y = im.size
+            arr = np.array(im)
+
+            arr =  conditional_dilation(arr)
+            im = get_PIL_by_numpy(arr)
+            
+            self.show_file(im)     
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
