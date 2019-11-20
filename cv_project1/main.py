@@ -205,17 +205,17 @@ class PhotoFilter(QWidget):
             if int(text) is not None:
                 self.kernel_size =  int(text)
             else:
-                self.kernel_size = 10
+                self.kernel_size = 5
         
         except:
-            self.kernel_size = 10
+            self.kernel_size = 5
         
 
     def sigma_text_OnChanged(self,text):
         # add text to selected shape
         try:
             if float(text) is not None:
-                if  float(text) <= 1 :
+                if  float(text) <= 1 and float(text)>0:
                     self.sigma = int(text) 
         except: 
                 self.sigma =1
