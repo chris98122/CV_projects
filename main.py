@@ -72,6 +72,7 @@ class PhotoFilter(QWidget):
         filterMenu.addAction(edge)
         filterMenu.addAction(gradient) 
         filterMenu.addAction(cond_dilation) 
+        filterMenu.addAction(grey_reconstruction) 
         
         hbox.setMenuBar(menubar)
             
@@ -172,7 +173,7 @@ class PhotoFilter(QWidget):
             x, y = im.size
             arr = np.array(im)
 
-            arr =  grey_recon(arr)
+            arr =  gray_recon(arr)
             im = get_PIL_by_numpy(arr)
             
             self.show_file(im)     

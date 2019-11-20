@@ -39,6 +39,19 @@ def andarr(a,b):
                 c[i,j,2] = a[i,j,2]
     return c
 
+def check_small_than(a,b):
+    assert(a.shape[0] == b.shape[0]) 
+    assert(a.shape[1] == b.shape[1])
+    
+    c= np.zeros(a.shape)
+    for i in range(a.shape[0] ):
+        for j in range(a.shape[1]): 
+                c[i,j,0] = min( a[i,j,0], b[i,j,0])  
+                c[i,j,1] = min( a[i,j,1], b[i,j,1])  
+                c[i,j,2] = min( a[i,j,2], b[i,j,2])  
+    return c
+
+
 def edge_detection(arr):
     #gray scale dilation 
     kernel_len = 3
@@ -71,7 +84,21 @@ def conditional_dilation(arr):
             return T_arr
     return arr
 
-def grey_recon(arr):
+def gray_recon(arr):
+    kernel_len = 2  
+    f = dilation(arr ,kernel_len) 
+    M_arr = arr
+    count=1
+    while(1):
+        M_arr = dilation(M_arr ,kernel_len)
+        temp = M_arr
+        M_arr = check_small_than(M_arr,f)
+        if((temp == M_arr).all()):
+            return M_arr
+        count = count+1
+        if (count> 30):
+            return M_arr
+
     return arr
 
 def add_padding(pad,arr):
