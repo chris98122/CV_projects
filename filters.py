@@ -23,7 +23,8 @@ def dilation(arr,pad):
             dilation_arr[i, j, 0] =  np.max(arr[i-pad:i+pad, j-pad:j+pad, 0])
             dilation_arr[i, j, 1] =  np.max(arr[i-pad:i+pad, j-pad:j+pad, 1])
             dilation_arr[i, j, 2] =  np.max(arr[i-pad:i+pad, j-pad:j+pad, 2])
-    return  minus_padding(pad*2,x,y,dilation_arr)   
+    return  minus_padding(pad*2,x,y,dilation_arr)  
+
 def andarr(a,b):
     assert(a.shape[0] == b.shape[0]) 
     assert(a.shape[1] == b.shape[1])
@@ -57,8 +58,7 @@ def gradient(arr):
 
 def conditional_dilation(arr):  
     kernel_len = 2  
-    M_arr = dilation(erosion(arr,kernel_len) ,kernel_len)
-    
+    M_arr = dilation(erosion(arr,kernel_len) ,kernel_len) 
     count=1
     while(1):
         T_arr= M_arr
@@ -71,6 +71,8 @@ def conditional_dilation(arr):
             return T_arr
     return arr
 
+def grey_recon(arr):
+    return arr
 
 def add_padding(pad,arr):
     return np.pad(arr,  ((pad,pad ),(pad,pad ),(0,0)),"constant", constant_values=(180))

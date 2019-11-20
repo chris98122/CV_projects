@@ -57,6 +57,11 @@ class PhotoFilter(QWidget):
         cond_dilation.setShortcut('ctrl+N')
         cond_dilation.setStatusTip('Binary Reconstruction')
         cond_dilation.triggered.connect(self.cond_dilation)
+        
+        grey_reconstruction= QAction('Gray scale Reconstruction', self)
+        grey_reconstruction.setShortcut('ctrl+J')
+        grey_reconstruction.setStatusTip('Gray scale Reconstruction')
+        grey_reconstruction.triggered.connect(self.grey_reconstruction)
 
         menubar = QMenuBar()
         fileMenu = menubar.addMenu('&File')
@@ -157,6 +162,21 @@ class PhotoFilter(QWidget):
             im = get_PIL_by_numpy(arr)
             
             self.show_file(im)     
+    
+    def grey_reconstruction(self):
+         if self.fname:
+            im = Image.open(self.fname)
+            if im.mode != 'RGB':
+                im = im.convert('RGB')
+
+            x, y = im.size
+            arr = np.array(im)
+
+            arr =  grey_recon(arr)
+            im = get_PIL_by_numpy(arr)
+            
+            self.show_file(im)     
+
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
