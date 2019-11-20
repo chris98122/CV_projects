@@ -43,10 +43,10 @@ class PhotoFilter(QWidget):
         saveFile.setStatusTip('Save file as...')
         saveFile.triggered.connect(self.save_file)
 
-        Gaussian = QAction('Gaussian filter', self)
-        Gaussian.setShortcut('ctrl+L')
-        Gaussian.setStatusTip('Gaussian filter')
-        Gaussian.triggered.connect(self.Gaussian_filter)
+        edge = QAction('edge detection', self)
+        edge.setShortcut('ctrl+L')
+        edge.setStatusTip('edge detection')
+        edge.triggered.connect(self.edge)
  
 
         menubar = QMenuBar()
@@ -58,30 +58,6 @@ class PhotoFilter(QWidget):
         hbox.setMenuBar(menubar)
             
         self.arr = None
-        self.kernel_size = 5
-        self.sigma = 1
-
-        listLayout = QVBoxLayout()
-        self.kernel_text = QLineEdit(self)
-        self.kernel_text.textChanged[str].connect(self.kernel_text_OnChanged) 
-
-        self.sigma_text = QLineEdit(self)
-        self.sigma_text.textChanged[str].connect(self.sigma_text_OnChanged) 
-
-        self.kernel_text.setAlignment(Qt.AlignBottom)
-
-        self.ql = QLabel("kernel size")
-        self.ql .setAlignment(Qt.AlignBottom) 
-        self.ql.setMaximumHeight(10)
-        hbox.addWidget( self.ql  )  
-        
-        hbox.addWidget(  self.kernel_text)  
-        self.ql2= QLabel("sigma size")
-        self.ql2.setMaximumHeight(10)
-        self.ql2 .setAlignment(Qt.AlignBottom)
-        hbox.addWidget(self.ql2 )   
-        self.sigma_text.setAlignment(Qt.AlignBottom)
-        hbox.addWidget(  self.sigma_text)
 
     def eventFilter(self, source, event):
         if (source is self.lbl and event.type() == QEvent.Resize):
@@ -127,7 +103,7 @@ class PhotoFilter(QWidget):
 
         self.screen_print(fn)
 
-    def Gaussian_filter(self):
+    def edge(self):
         if self.fname:
             im = Image.open(self.fname)
             if im.mode != 'RGB':
@@ -136,33 +112,10 @@ class PhotoFilter(QWidget):
             x, y = im.size
             arr = np.array(im)
 
-            arr = Gaussian_filter_implement(self.kernel_size,self.sigma,arr) 
+            #arr =  func()
             im = get_PIL_by_numpy(arr)
             
             self.show_file(im)
-
- 
-
-    def kernel_text_OnChanged(self,text):
-        # add text to selected shape
-        try:
-            if int(text) is not None:
-                self.kernel_size =  int(text)
-            else:
-                self.kernel_size = 10
-        
-        except:
-            self.kernel_size = 10
-        
-
-    def sigma_text_OnChanged(self,text):
-        # add text to selected shape
-        try:
-            if float(text) is not None:
-                if  float(text) <= 1 :
-                    self.sigma = int(text) 
-        except: 
-                self.sigma =1
 
 
 if __name__ == '__main__':
