@@ -43,9 +43,9 @@ class PhotoFilter(QWidget):
         saveFile.setStatusTip('Save file as...')
         saveFile.triggered.connect(self.save_file)
 
-        edge = QAction('edge detection', self)
+        edge = QAction('Morphological edge detection', self)
         edge.setShortcut('ctrl+L')
-        edge.setStatusTip('edge detection')
+        edge.setStatusTip('Morphological edge detection')
         edge.triggered.connect(self.edge)
  
         gradient= QAction('Morphological gradient', self)
