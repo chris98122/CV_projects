@@ -48,13 +48,17 @@ class PhotoFilter(QWidget):
         edge.setStatusTip('edge detection')
         edge.triggered.connect(self.edge)
  
+        gradient= QAction('Morphological gradient', self)
+        gradient.setShortcut('ctrl+L')
+        gradient.setStatusTip('Morphological gradient')
+        gradient.triggered.connect(self.gradient)
 
         menubar = QMenuBar()
         fileMenu = menubar.addMenu('&File')
         filterMenu = menubar.addMenu('&Filters')
         fileMenu.addAction(openFile)
         fileMenu.addAction(saveFile)
-        filterMenu.addAction(Gaussian) 
+        filterMenu.addAction(edge) 
         hbox.setMenuBar(menubar)
             
         self.arr = None
@@ -112,7 +116,21 @@ class PhotoFilter(QWidget):
             x, y = im.size
             arr = np.array(im)
 
-            #arr =  func()
+            arr =  edge_detection(arr)
+            im = get_PIL_by_numpy(arr)
+            
+            self.show_file(im)
+
+    def gradient(self):
+         if self.fname:
+            im = Image.open(self.fname)
+            if im.mode != 'RGB':
+                im = im.convert('RGB')
+
+            x, y = im.size
+            arr = np.array(im)
+
+            arr =  gradient(arr)
             im = get_PIL_by_numpy(arr)
             
             self.show_file(im)

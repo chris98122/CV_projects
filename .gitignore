@@ -6,3 +6,5 @@ cv_project1/lena.jpg
 cv_project1/code.zip
 cv_project1/dist/main.exe
 dist/main.exe
+*.png
+
