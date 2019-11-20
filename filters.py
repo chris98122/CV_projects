@@ -62,16 +62,15 @@ def edge_detection(arr):
 
 def gradient(arr):
     #gray scale dilation 
-    kernel_len = 3
-    
+    kernel_len = 3 
     dilation_arr =  dilation(arr,kernel_len//2)
     erosion_arr = erosion(arr,kernel_len) 
 
     return (dilation_arr - erosion_arr)/2
 
 def conditional_dilation(arr):  
-    kernel_len = 2  
-    M_arr = dilation(erosion(arr,kernel_len) ,kernel_len) 
+    kernel_len = 3  
+    M_arr = dilation(erosion(arr,kernel_len//2) ,kernel_len//2) 
     count=1
     while(1):
         T_arr= M_arr
@@ -85,12 +84,12 @@ def conditional_dilation(arr):
     return arr
 
 def gray_recon(arr):
-    kernel_len = 2  
-    f = dilation(arr ,kernel_len) 
+    kernel_len = 3 
+    f = dilation(arr ,kernel_len//2) 
     M_arr = arr
     count=1
     while(1):
-        M_arr = dilation(M_arr ,kernel_len)
+        M_arr = dilation(M_arr,kernel_len//2) 
         temp = M_arr
         M_arr = check_small_than(M_arr,f)
         if((temp == M_arr).all()):

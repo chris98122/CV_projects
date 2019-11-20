@@ -30,7 +30,7 @@ class PhotoFilter(QWidget):
         self.setGeometry(screen_res[0] // 5, screen_res[1] // 5, screen_res[0]
                          // 2, screen_res[1] // 2)
         self.setWindowState(Qt.WindowMaximized)
-        self.setWindowTitle('project1 by chris')
+        self.setWindowTitle('project2 by chris')
         self.setWindowIcon(QIcon(self.resource_path('data\Logo.ico')))
 
         openFile = QAction('Open', self)
