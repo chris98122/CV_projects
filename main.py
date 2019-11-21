@@ -1,10 +1,10 @@
 import sys, os.path, tempfile
 from PyQt5.QtWidgets import QFileDialog, QLabel, QAction,\
-    QApplication, QMenuBar, QWidget, QVBoxLayout
+    QApplication, QMenuBar, QWidget, QVBoxLayout,QTextEdit
 from PyQt5.QtGui import QPixmap, QIcon
 from PyQt5.QtCore import Qt, QEvent
 from PIL import Image, ImageFilter, ImageGrab
-
+from PyQt5 import QtCore, QtGui, QtWidgets
 from filters import *
 from util import *
 class PhotoFilter(QWidget):
@@ -75,8 +75,22 @@ class PhotoFilter(QWidget):
         filterMenu.addAction(grey_reconstruction) 
         
         hbox.setMenuBar(menubar)
-            
+        self.ql2= QLabel("SE")
+        self.ql2.setMaximumHeight(20)
+        self.ql2 .setAlignment(Qt.AlignBottom)
+        hbox.addWidget(self.ql2 )   
+        self.SE_edit=QTextEdit(self) 
+        self.SE_edit.setMaximumWidth(300)
+        self.SE_edit.setMaximumHeight(300)
+
+        self.SE_edit.textChanged.connect(self.SE_edit_OnChanged) 
+        
+        hbox.addWidget(self.SE_edit) 
         self.arr = None
+        self.SE =  np.array([[1,1,1],
+                      [ 1, 1, 1],
+                      [ 1, 1, 1]])
+
 
     def eventFilter(self, source, event):
         if (source is self.lbl and event.type() == QEvent.Resize):
@@ -177,6 +191,14 @@ class PhotoFilter(QWidget):
             im = get_PIL_by_numpy(arr)
             
             self.show_file(im)     
+ 
+    def SE_edit_OnChanged(self):
+        try:
+            self.SE = process_SE(self.SE_edit.toPlainText())
+        except:
+            self.SE =  np.array([[1,1,1],
+                      [ 1, 1, 1],
+                      [ 1, 1, 1]])
 
 
 if __name__ == '__main__':
