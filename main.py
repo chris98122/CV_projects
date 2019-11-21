@@ -186,7 +186,6 @@ class PhotoFilter(QWidget):
 
             x, y = im.size
             arr = np.array(im)
-
             arr =  gray_recon(arr)
             im = get_PIL_by_numpy(arr)
             
@@ -194,8 +193,10 @@ class PhotoFilter(QWidget):
  
     def SE_edit_OnChanged(self):
         try:
-            self.SE = process_SE(self.SE_edit.toPlainText())
+            if valid_SE(self.SE_edit.toPlainText()):
+                self.SE = process_SE(self.SE_edit.toPlainText()) 
         except:
+            print("not valid") 
             self.SE =  np.array([[1,1,1],
                       [ 1, 1, 1],
                       [ 1, 1, 1]])
