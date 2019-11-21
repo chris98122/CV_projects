@@ -13,14 +13,18 @@ import numpy as np
 
 from PIL import Image 
 def valid_SE(input):
-    lines = input.split('\n')
-    temp = len(lines[0].split(" "))
+    lines = input.split('\n') 
+    linenum=len(lines)
+    
+    temp = 0
     #print("len lines",len(lines))
-    for line in lines:
+    for i in range( linenum):
         #print(line)
-        words = line.split(" ") 
+        lines[i] = lines[i].strip()
+        words = lines[i].split(" ") 
         wordnum = len(words)
-       # print(wordnum)
+        if i == 0:
+            temp = wordnum
         for word in words:
             if int(word) is None:
                 return False   
@@ -33,11 +37,12 @@ def valid_SE(input):
 def process_SE(input):
     lines = input.split('\n')
     linenum=len(lines)
-    wordnum = len(lines[0].split(" "))
+    wordnum = len(lines[0].strip().split(" "))
     shape = (linenum, wordnum)
     arr =  np.zeros(shape) 
     for i in range( linenum):
         for j in range(wordnum):
+            lines[i] = lines[i].strip()
             words = lines[i].split(" ") 
             arr[i][j] = int(words[j])
     print(arr)

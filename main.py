@@ -77,12 +77,17 @@ class PhotoFilter(QWidget):
         hbox.setMenuBar(menubar)
         self.ql2= QLabel("SE")
         self.ql2.setMaximumHeight(20)
-        self.ql2 .setAlignment(Qt.AlignBottom)
+        self.ql2.setAlignment(Qt.AlignBottom)
         hbox.addWidget(self.ql2 )   
+        
+        self.ql= QLabel("VALID")
+        self.ql.setMaximumHeight(20)
+        self.ql.setAlignment(Qt.AlignBottom)
+        hbox.addWidget(self.ql )   
         self.SE_edit=QTextEdit(self) 
         self.SE_edit.setMaximumWidth(300)
         self.SE_edit.setMaximumHeight(300)
-
+        self.SE_edit.setText("1 1 1 \n1 1 1 \n1 1 1")
         self.SE_edit.textChanged.connect(self.SE_edit_OnChanged) 
         
         hbox.addWidget(self.SE_edit) 
@@ -145,7 +150,7 @@ class PhotoFilter(QWidget):
             x, y = im.size
             arr = np.array(im)
 
-            arr =  edge_detection(arr)
+            arr =  edge_detection(arr,self.SE)
             im = get_PIL_by_numpy(arr)
             
             self.show_file(im)
@@ -159,7 +164,7 @@ class PhotoFilter(QWidget):
             x, y = im.size
             arr = np.array(im)
 
-            arr =  gradient(arr)
+            arr =  gradient(arr,self.SE)
             im = get_PIL_by_numpy(arr)
             
             self.show_file(im)
@@ -173,7 +178,7 @@ class PhotoFilter(QWidget):
             x, y = im.size
             arr = np.array(im)
 
-            arr =  conditional_dilation(arr)
+            arr =  conditional_dilation(arr,self.SE)
             im = get_PIL_by_numpy(arr)
             
             self.show_file(im)     
@@ -186,7 +191,7 @@ class PhotoFilter(QWidget):
 
             x, y = im.size
             arr = np.array(im)
-            arr =  gray_recon(arr)
+            arr =  gray_recon(arr,self.SE)
             im = get_PIL_by_numpy(arr)
             
             self.show_file(im)     
@@ -194,9 +199,12 @@ class PhotoFilter(QWidget):
     def SE_edit_OnChanged(self):
         try:
             if valid_SE(self.SE_edit.toPlainText()):
-                self.SE = process_SE(self.SE_edit.toPlainText()) 
-        except:
-            print("not valid") 
+                self.ql.setText("VALID") 
+                self.SE = process_SE(self.SE_edit.toPlainText())  
+            else:
+                self.ql.setText("not valid,use default SE") 
+        except: 
+            self.ql.setText("not valid,use default SE") 
             self.SE =  np.array([[1,1,1],
                       [ 1, 1, 1],
                       [ 1, 1, 1]])
