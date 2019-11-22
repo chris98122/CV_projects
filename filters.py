@@ -1,65 +1,81 @@
 import numpy as np
 
-def erosion(arr,SE):   
+def erosion(arr,SE,center):   
     x=arr.shape[0]
     y=arr.shape[1]    
     
-    pad_x = SE.shape[0]
-    pad_y = SE.shape[1]
-    arr = add_padding(max(pad_x,pad_y)*2,arr) 
-    erosion_arr = np.zeros(arr.shape)
-    for i in range( arr.shape[0] - pad_x):
-        for j in range( arr.shape[1] -pad_y):
-            erosion_arr[i, j, 0] =  np.min(arr[i:i+pad_x, j:j+pad_y, 0] + SE)
-            erosion_arr[i, j, 1] =  np.min(arr[i:i+pad_x , j:j+pad_y, 1] + SE)
-            erosion_arr[i, j, 2] =  np.min(arr[i:i+pad_x , j:j+pad_y, 2] + SE)
+    kernel_x = SE.shape[0]
+    kernel_y = SE.shape[1]
+
+    center_x = center[0]
+    center_y = center[1]
+    arr = add_padding(max(kernel_x,kernel_y),arr)  
+    erosion_arr = np.zeros(arr.shape) 
+    for i in range( center_x , arr.shape[0] - (kernel_x- center_x)):
+        for j in range(center_y, arr.shape[1]-(kernel_y-center_y)):
+            erosion_arr[i, j, 0] =  np.min(arr[i-center_x:i+kernel_x- center_x, j -center_y:j+kernel_y-center_y, 0] + SE)
+            erosion_arr[i, j, 1] =  np.min(arr[i-center_x:i+kernel_x- center_x, j -center_y:j+kernel_y-center_y, 1] + SE)
+            erosion_arr[i, j, 2] =  np.min(arr[i-center_x:i+kernel_x- center_x, j -center_y:j+kernel_y-center_y, 2] + SE)
             
-    return  minus_padding(max(pad_x,pad_y)*2,x,y,erosion_arr)  
+    return  minus_padding(max(kernel_x,kernel_y),x,y,erosion_arr)    
 
-def dilation(arr,SE):  
+def dilation(arr,SE,center):  
     x=arr.shape[0]
     y=arr.shape[1]    
-    pad_x = SE.shape[0]
-    pad_y = SE.shape[1]
-    arr = add_padding(max(pad_x,pad_y)*2,arr)  
+
+    kernel_x = SE.shape[0]
+    kernel_y = SE.shape[1]
+    
+    center_x = center[0]
+    center_y = center[1]
+
+    arr = add_padding(max(kernel_x,kernel_y),arr)  
     dilation_arr =  np.zeros(arr.shape) 
-    for i in range( arr.shape[0]- pad_x):
-        for j in range(arr.shape[1]-pad_y):
-            dilation_arr[i, j, 0] =  np.max(arr[i:i+pad_x , j:j+pad_y, 0] + SE)
-            dilation_arr[i, j, 1] =  np.max(arr[i:i+pad_x , j:j+pad_y, 1] + SE)
-            dilation_arr[i, j, 2] =  np.max(arr[i:i+pad_x , j:j+pad_y, 2] + SE)
-    return  minus_padding(max(pad_x,pad_y)*2,x,y,dilation_arr)  
+    for i in range( center_x , arr.shape[0] - (kernel_x- center_x)):
+        for j in range(center_y, arr.shape[1] -(kernel_y-center_y)):
+            dilation_arr[i, j, 0] =  np.max(arr[i-center_x:i+kernel_x- center_x, j -center_y:j+kernel_y-center_y, 0] + SE)
+            dilation_arr[i, j, 1] =  np.max(arr[i-center_x:i+kernel_x- center_x, j -center_y:j+kernel_y-center_y, 1] + SE)
+            dilation_arr[i, j, 2] =  np.max(arr[i-center_x:i+kernel_x- center_x, j -center_y:j+kernel_y-center_y, 2] + SE)
+    return  minus_padding(max(kernel_x,kernel_y),x,y,dilation_arr)  
 
 
-def binary_dilation(arr,SE):   
-    x=arr.shape[0]
-    y=arr.shape[1]    
-    pad_x = SE.shape[0]
-    pad_y = SE.shape[1]
-    arr = add_padding(max(pad_x,pad_y)*2,arr)  
-    dilation_arr =  np.zeros(arr.shape) 
-    for i in range( arr.shape[0]- pad_x):
-        for j in range(arr.shape[1]-pad_y):
-            dilation_arr[i, j, 0] =  np.max(np.multiply(arr[i:i+pad_x , j:j+pad_y, 0],SE))
-            dilation_arr[i, j, 1] =  np.max(np.multiply(arr[i:i+pad_x , j:j+pad_y, 1] ,SE))
-            dilation_arr[i, j, 2] =  np.max(np.multiply(arr[i:i+pad_x , j:j+pad_y, 2] ,SE))
-    return  minus_padding(max(pad_x,pad_y)*2,x,y,dilation_arr)  
-
-def binary_erosion(arr,SE):   
+def binary_dilation(arr,SE,center):   
     x=arr.shape[0]
     y=arr.shape[1]    
     
-    pad_x = SE.shape[0]
-    pad_y = SE.shape[1]
-    arr = add_padding(max(pad_x,pad_y)*2,arr) 
+    kernel_x = SE.shape[0]
+    kernel_y = SE.shape[1]
+    
+    center_x = center[0]
+    center_y = center[1]
+
+    arr = add_padding(max(kernel_x,kernel_y),arr)  
+    dilation_arr =  np.zeros(arr.shape) 
+    for i in range( center_x , arr.shape[0] - (kernel_x- center_x)):
+        for j in  range(center_y, arr.shape[1] -(kernel_y-center_y)):
+            dilation_arr[i, j, 0] =  np.max(np.multiply(arr[i-center_x:i+kernel_x- center_x, j -center_y:j+kernel_y-center_y, 0] , SE))
+            dilation_arr[i, j, 1] =  np.max(np.multiply(arr[i-center_x:i+kernel_x- center_x, j -center_y:j+kernel_y-center_y, 1] , SE))
+            dilation_arr[i, j, 2] =  np.max(np.multiply(arr[i-center_x:i+kernel_x- center_x, j -center_y:j+kernel_y-center_y, 2] , SE))
+    return  minus_padding(max(kernel_x,kernel_y),x,y,dilation_arr)  
+
+def binary_erosion(arr,SE,center):   
+    x=arr.shape[0]
+    y=arr.shape[1]    
+    
+    kernel_x = SE.shape[0]
+    kernel_y = SE.shape[1]
+    
+    center_x = center[0]
+    center_y = center[1]
+
+    arr = add_padding(max(kernel_x,kernel_y),arr)   
     erosion_arr = np.zeros(arr.shape)
-    for i in range( arr.shape[0] - pad_x):
-        for j in range( arr.shape[1] -pad_y):
-            erosion_arr[i, j, 0] =  np.min(np.multiply(arr[i:i+pad_x, j:j+pad_y, 0],SE))
-            erosion_arr[i, j, 1] =  np.min(np.multiply(arr[i:i+pad_x , j:j+pad_y, 1] ,SE))
-            erosion_arr[i, j, 2] =  np.min(np.multiply(arr[i:i+pad_x , j:j+pad_y, 2],SE))
-            
-    return  minus_padding(max(pad_x,pad_y)*2,x,y,erosion_arr)  
+    for i in range( center_x , arr.shape[0] - (kernel_x- center_x)):
+        for j in  range(center_y, arr.shape[1] -(kernel_y-center_y)):
+            erosion_arr[i, j, 0] =  np.min(np.multiply(arr[i-center_x:i+kernel_x- center_x, j -center_y:j+kernel_y-center_y, 0] , SE))
+            erosion_arr[i, j, 1] =  np.min(np.multiply(arr[i-center_x:i+kernel_x- center_x, j -center_y:j+kernel_y-center_y, 1] , SE))
+            erosion_arr[i, j, 2] =  np.min(np.multiply(arr[i-center_x:i+kernel_x- center_x, j -center_y:j+kernel_y-center_y, 2] , SE))
+    return    minus_padding(max(kernel_x,kernel_y),x,y,erosion_arr)  
 
 def andarr(a,b):
     assert(a.shape[0] == b.shape[0]) 
@@ -88,40 +104,41 @@ def check_small_than(a,b):
     return c
 
 
-def edge_detection(arr,SE):
+def edge_detection(arr,SE,center):
     #gray scale dilation  
-    dilation_arr =  dilation(arr,SE)
-    erosion_arr = erosion(arr,SE) 
+    dilation_arr =  dilation(arr,SE,center)
+    erosion_arr = erosion(arr,SE,center) 
     return dilation_arr - erosion_arr
 
-def gradient(arr,SE):
+def gradient(arr,SE,center):
     #gray scale dilation 
-    dilation_arr =  dilation(arr,SE)
-    erosion_arr = erosion(arr,SE)
+    dilation_arr =  dilation(arr,SE,center)
+    erosion_arr = erosion(arr,SE,center)
 
     return (dilation_arr - erosion_arr)/2
 
-def conditional_dilation(arr,SE): 
-    M_arr = binary_dilation(binary_erosion(arr,SE) ,SE) 
+def conditional_dilation(arr,SE,center): 
+    M_arr = binary_dilation(binary_erosion(arr,SE,center) ,SE,center) 
     
     count=1
     while(1):
         T_arr= M_arr
-        M_arr = binary_dilation(M_arr ,SE)
+        M_arr = binary_dilation(M_arr ,SE,center)
         M_arr = andarr(M_arr,arr)
         if((T_arr == M_arr).all()):
+            print("count:",count)
             return T_arr
         count = count+1
         if (count> 20):
             return T_arr
     return arr
 
-def gray_recon(arr,SE): 
-    f = dilation(arr ,SE) 
+def gray_recon(arr,SE,center): 
+    f = dilation(arr ,SE,center) 
     M_arr = arr
     count=1
     while(1):
-        M_arr = dilation(M_arr,SE) 
+        M_arr = dilation(M_arr,SE,center) 
         temp = M_arr
         M_arr = check_small_than(M_arr,f)
         if((temp == M_arr).all()):

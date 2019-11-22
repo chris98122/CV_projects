@@ -179,7 +179,7 @@ class PhotoFilter(QWidget):
             x, y = im.size
             arr = np.array(im)
 
-            arr =  edge_detection(arr,self.SE)
+            arr =  edge_detection(arr,self.SE,self.center )
             im = get_PIL_by_numpy(arr)
             
             self.show_file(im)
@@ -193,7 +193,7 @@ class PhotoFilter(QWidget):
             x, y = im.size
             arr = np.array(im)
 
-            arr =  gradient(arr,self.SE)
+            arr =  gradient(arr,self.SE,self.center )
             im = get_PIL_by_numpy(arr)
             
             self.show_file(im)
@@ -207,7 +207,7 @@ class PhotoFilter(QWidget):
             x, y = im.size
             arr = np.array(im)
 
-            arr =  conditional_dilation(arr,self.SE)
+            arr =  conditional_dilation(arr,self.SE,self.center )
             im = get_PIL_by_numpy(arr)
             
             self.show_file(im)     
@@ -220,7 +220,7 @@ class PhotoFilter(QWidget):
 
             x, y = im.size
             arr = np.array(im)
-            arr =  gray_recon(arr,self.SE)
+            arr =  gray_recon(arr,self.SE,self.center )
             im = get_PIL_by_numpy(arr)
             
             self.show_file(im)     
@@ -235,6 +235,7 @@ class PhotoFilter(QWidget):
                 self.SE =  np.array([[1,1,1],
                         [ 1, 1, 1],
                         [ 1, 1, 1]])
+                self.center_edit_OnChanged(self.center_edit.text())
         except: 
             self.ql.setText("not valid,use default SE") 
             self.SE =  np.array([[1,1,1],
