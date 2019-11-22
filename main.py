@@ -1,6 +1,6 @@
 import sys, os.path, tempfile
 from PyQt5.QtWidgets import QFileDialog, QLabel, QAction,\
-    QApplication, QMenuBar, QWidget, QVBoxLayout,QTextEdit
+    QApplication, QMenuBar, QWidget, QVBoxLayout,QTextEdit,QLineEdit,QHBoxLayout
 from PyQt5.QtGui import QPixmap, QIcon
 from PyQt5.QtCore import Qt, QEvent
 from PIL import Image, ImageFilter, ImageGrab
@@ -24,8 +24,8 @@ class PhotoFilter(QWidget):
         self.lbl.setPixmap(self.pixmap)
         self.lbl.setMinimumSize(screen_res[0] // 10, screen_res[1] // 10)
         self.lbl.installEventFilter(self)
-        hbox = QVBoxLayout(self)
-        hbox.addWidget(self.lbl)
+        hbox = QHBoxLayout(self)
+        
         self.setLayout(hbox)
         self.setGeometry(screen_res[0] // 5, screen_res[1] // 5, screen_res[0]
                          // 2, screen_res[1] // 2)
@@ -75,22 +75,43 @@ class PhotoFilter(QWidget):
         filterMenu.addAction(grey_reconstruction) 
         
         hbox.setMenuBar(menubar)
+
         self.ql2= QLabel("SE")
-        self.ql2.setMaximumHeight(20)
-        self.ql2.setAlignment(Qt.AlignBottom)
-        hbox.addWidget(self.ql2 )   
+        self.ql2.setMaximumHeight(20) 
+        self.ql2.setAlignment(Qt.AlignBottom) 
         
         self.ql= QLabel("VALID")
-        self.ql.setMaximumHeight(20)
-        self.ql.setAlignment(Qt.AlignBottom)
-        hbox.addWidget(self.ql )   
+        self.ql.setMaximumHeight(20)  
+        self.ql.setAlignment(Qt.AlignBottom) 
+
         self.SE_edit=QTextEdit(self) 
         self.SE_edit.setMaximumWidth(300)
         self.SE_edit.setMaximumHeight(300)
         self.SE_edit.setText("1 1 1 \n1 1 1 \n1 1 1")
         self.SE_edit.textChanged.connect(self.SE_edit_OnChanged) 
+        self.SE_edit.setAlignment(Qt.AlignBottom) 
+
+        self.ql3= QLabel("center")
+        self.ql3.setMaximumHeight(20)
+        self.ql3.setAlignment(Qt.AlignBottom)
+
+        self.center_edit=QLineEdit(self)  
+        self.center_edit.setMaximumWidth(300)
+        self.center_edit.setMaximumHeight(30)
+        self.center_edit.setText("1 1")
         
-        hbox.addWidget(self.SE_edit) 
+        self.center_edit.setAlignment(Qt.AlignBottom)
+
+        childlayout = QVBoxLayout(self)
+        childlayout.addWidget(self.ql2)
+        childlayout.addWidget(self.ql)
+        childlayout.addWidget(self.SE_edit)
+        childlayout.addWidget(self.ql3)
+        childlayout.addWidget(self.center_edit)
+
+        hbox.addLayout(childlayout) 
+        hbox.addWidget(self.lbl)
+
         self.arr = None
         self.SE =  np.array([[1,1,1],
                       [ 1, 1, 1],
