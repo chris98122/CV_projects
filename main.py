@@ -91,22 +91,28 @@ class PhotoFilter(QWidget):
         self.SE_edit.textChanged.connect(self.SE_edit_OnChanged) 
         self.SE_edit.setAlignment(Qt.AlignBottom) 
 
-        self.ql3= QLabel("center")
+        self.ql3= QLabel("center (start from 0,0)")
         self.ql3.setMaximumHeight(20)
-        self.ql3.setAlignment(Qt.AlignBottom)
+        self.ql3.setAlignment(Qt.AlignBottom) 
+
+        self.ql4= QLabel("VALID")
+        self.ql4.setMaximumHeight(20)
+        self.ql4.setAlignment(Qt.AlignBottom)
 
         self.center_edit=QLineEdit(self)  
         self.center_edit.setMaximumWidth(300)
-        self.center_edit.setMaximumHeight(30)
-        self.center_edit.setText("1 1")
-        
+        self.center_edit.setMaximumHeight(20)
+        self.center_edit.setText("0 0")
         self.center_edit.setAlignment(Qt.AlignBottom)
+        self.center_edit.textChanged.connect(self.center_edit_OnChanged) 
+
 
         childlayout = QVBoxLayout(self) 
         childlayout.addWidget(self.ql2)
         childlayout.addWidget(self.ql)
         childlayout.addWidget(self.SE_edit)
         childlayout.addWidget(self.ql3)
+        childlayout.addWidget(self.ql4)
         childlayout.addWidget(self.center_edit) 
         childlayout.setAlignment(Qt.AlignVCenter)
 
@@ -117,6 +123,7 @@ class PhotoFilter(QWidget):
         self.SE =  np.array([[1,1,1],
                       [ 1, 1, 1],
                       [ 1, 1, 1]])
+        self.center =  [0,0]
 
 
     def eventFilter(self, source, event):
@@ -225,12 +232,27 @@ class PhotoFilter(QWidget):
                 self.SE = process_SE(self.SE_edit.toPlainText())  
             else:
                 self.ql.setText("not valid,use default SE") 
+                self.SE =  np.array([[1,1,1],
+                        [ 1, 1, 1],
+                        [ 1, 1, 1]])
         except: 
             self.ql.setText("not valid,use default SE") 
             self.SE =  np.array([[1,1,1],
                       [ 1, 1, 1],
                       [ 1, 1, 1]])
 
+    def center_edit_OnChanged(self,text):
+        try:
+            if valid_center(text,self.SE):
+                self.ql4.setText("VALID") 
+                self.center = process_center(text,self.SE)          
+            else:
+                self.ql4.setText("not valid,use default center 0,0")        
+                self.center = [0,0]
+        except: 
+            self.ql4.setText("not valid,use default center 0,0")        
+            self.center = [0,0]
+   
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
