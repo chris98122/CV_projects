@@ -88,7 +88,6 @@ class PhotoFilter(QWidget):
         self.SE_edit.setMaximumWidth(300)
         self.SE_edit.setMaximumHeight(300)
         self.SE_edit.setText("1 1 1 \n1 1 1 \n1 1 1")
-        self.SE_edit.textChanged.connect(self.SE_edit_OnChanged) 
         self.SE_edit.setAlignment(Qt.AlignBottom) 
 
         self.ql3= QLabel("center (start from 0,0)")
@@ -104,8 +103,8 @@ class PhotoFilter(QWidget):
         self.center_edit.setMaximumHeight(20)
         self.center_edit.setText("0 0")
         self.center_edit.setAlignment(Qt.AlignBottom)
-        self.center_edit.textChanged.connect(self.center_edit_OnChanged) 
-
+        self.center_edit.textChanged.connect(self.center_edit_OnChanged)  
+        self.SE_edit.textChanged.connect(self.SE_edit_OnChanged) 
 
         childlayout = QVBoxLayout(self) 
         childlayout.addWidget(self.ql2)
@@ -229,18 +228,18 @@ class PhotoFilter(QWidget):
         try:
             if valid_SE(self.SE_edit.toPlainText()):
                 self.ql.setText("VALID") 
-                self.SE = process_SE(self.SE_edit.toPlainText())  
+                self.SE = process_SE(self.SE_edit.toPlainText())   
             else:
                 self.ql.setText("not valid,use default SE") 
                 self.SE =  np.array([[1,1,1],
                         [ 1, 1, 1],
                         [ 1, 1, 1]])
-                self.center_edit_OnChanged(self.center_edit.text())
         except: 
             self.ql.setText("not valid,use default SE") 
             self.SE =  np.array([[1,1,1],
                       [ 1, 1, 1],
                       [ 1, 1, 1]])
+        self.center_edit_OnChanged(self.center_edit.text())
 
     def center_edit_OnChanged(self,text):
         try:

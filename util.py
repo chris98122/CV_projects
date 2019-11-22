@@ -32,6 +32,9 @@ def valid_SE(input):
         if temp != wordnum:
             return False 
         temp = wordnum
+        if linenum == 1 and wordnum == 1:
+            return False
+
     print("valid")
     return True
     
