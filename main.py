@@ -102,12 +102,13 @@ class PhotoFilter(QWidget):
         
         self.center_edit.setAlignment(Qt.AlignBottom)
 
-        childlayout = QVBoxLayout(self)
+        childlayout = QVBoxLayout(self) 
         childlayout.addWidget(self.ql2)
         childlayout.addWidget(self.ql)
         childlayout.addWidget(self.SE_edit)
         childlayout.addWidget(self.ql3)
-        childlayout.addWidget(self.center_edit)
+        childlayout.addWidget(self.center_edit) 
+        childlayout.setAlignment(Qt.AlignVCenter)
 
         hbox.addLayout(childlayout) 
         hbox.addWidget(self.lbl)
