@@ -17,6 +17,8 @@ from PIL import Image
 STANDARD = 1
 EXTERNAL =2
 INTERNAL =3
+OPEN =5
+CLOSE=6
 def valid_SE(input):
     lines = input.split('\n') 
     linenum=len(lines)
@@ -71,7 +73,7 @@ def valid_center(input,SE):
     # check size overflow
     x = int(words[0]) 
     y = int(words[1]) 
-    if x > SE.shape[0] -1 or y > SE.shape[1] -1 :
+    if x > SE.shape[1] -1 or y > SE.shape[0] -1 :
         return False
     return True
 

@@ -80,10 +80,14 @@ class PhotoFilter(QWidget):
         cond_dilation.setStatusTip('Binary Reconstruction')
         cond_dilation.triggered.connect(self.cond_dilation)
         
-        grey_reconstruction= QAction('Gray scale Reconstruction', self)
-        grey_reconstruction.setShortcut('ctrl+J')
-        grey_reconstruction.setStatusTip('Gray scale Reconstruction')
-        grey_reconstruction.triggered.connect(self.grey_reconstruction)
+        OBR= QAction('Gray scale Reconstruction(OBR)', self)
+        OBR.setShortcut('ctrl+J') 
+        OBR.triggered.connect(self.OBR)
+
+        CBR= QAction('Gray scale Reconstruction(CBR)', self)
+        CBR.setShortcut('ctrl+J') 
+        CBR.triggered.connect(self.CBR)
+
 
         menubar = QMenuBar()
         fileMenu = menubar.addMenu('&File')
@@ -97,14 +101,12 @@ class PhotoFilter(QWidget):
 
         filterMenu.addAction(gradient_standard) 
         filterMenu.addAction(gradient_external) 
-        filterMenu.addAction(gradient_internal) 
-
-
-
+        filterMenu.addAction(gradient_internal)  
 
         filterMenu.addAction(cond_dilation) 
-        filterMenu.addAction(grey_reconstruction) 
-        
+        filterMenu.addAction(OBR) 
+        filterMenu.addAction(CBR) 
+
         hbox.setMenuBar(menubar)
 
         self.ql2= QLabel("SE")
@@ -288,9 +290,6 @@ class PhotoFilter(QWidget):
                 
                 self.show_file(im)
 
-
-
-
     def cond_dilation(self): 
          if self.fname:
             im = Image.open(self.fname)
@@ -305,7 +304,7 @@ class PhotoFilter(QWidget):
             
             self.show_file(im)     
     
-    def grey_reconstruction(self):
+    def OBR(self):
          if self.fname:
             im = Image.open(self.fname)
             if im.mode != 'RGB':
@@ -313,7 +312,20 @@ class PhotoFilter(QWidget):
 
             x, y = im.size
             arr = np.array(im)
-            arr =  gray_recon(arr,self.SE,self.center )
+            arr =  gray_recon(arr,self.SE,self.center,OPEN )
+            im = get_PIL_by_numpy(arr)
+            
+            self.show_file(im)     
+    
+    def CBR(self):
+         if self.fname:
+            im = Image.open(self.fname)
+            if im.mode != 'RGB':
+                im = im.convert('RGB')
+
+            x, y = im.size
+            arr = np.array(im)
+            arr =  gray_recon(arr,self.SE,self.center,CLOSE )
             im = get_PIL_by_numpy(arr)
             
             self.show_file(im)     
