@@ -41,12 +41,24 @@ class PhotoFilter(QWidget):
         saveFile = QAction('Save As...', self)
         saveFile.setShortcut('Ctrl+S')
         saveFile.setStatusTip('Save file as...')
-        saveFile.triggered.connect(self.save_file)
+        saveFile.triggered.connect(self.save_file) 
 
-        edge = QAction('Morphological edge detection', self)
-        edge.setShortcut('ctrl+L')
-        edge.setStatusTip('Morphological edge detection')
-        edge.triggered.connect(self.edge)
+        edge_standard = QAction('Morphological edge detection(Standard)', self)
+        edge_standard.setShortcut('ctrl+Q') 
+        edge_standard.triggered.connect(self.edge_standard )
+
+
+        
+        edge_external = QAction('Morphological edge detection(external)', self)
+        edge_external.setShortcut('ctrl+R') 
+        edge_external.triggered.connect(self.edge_external )
+
+
+        
+        edge_internal = QAction('Morphological edge detection(internal)', self)
+        edge_internal.setShortcut('ctrl+T') 
+        edge_internal.triggered.connect(self.edge_internal )
+
  
         gradient= QAction('Morphological gradient', self)
         gradient.setShortcut('ctrl+M')
@@ -69,7 +81,11 @@ class PhotoFilter(QWidget):
         fileMenu.addAction(openFile)
         fileMenu.addAction(saveFile)
 
-        filterMenu.addAction(edge)
+        filterMenu.addAction(edge_standard)
+        filterMenu.addAction(edge_external)
+        filterMenu.addAction(edge_internal)
+
+
         filterMenu.addAction(gradient) 
         filterMenu.addAction(cond_dilation) 
         filterMenu.addAction(grey_reconstruction) 
@@ -169,7 +185,10 @@ class PhotoFilter(QWidget):
 
         self.screen_print(fn)
 
-    def edge(self):
+ 
+
+
+    def edge_standard(self):
         if self.fname:
             im = Image.open(self.fname)
             if im.mode != 'RGB':
@@ -178,10 +197,40 @@ class PhotoFilter(QWidget):
             x, y = im.size
             arr = np.array(im)
 
-            arr =  edge_detection(arr,self.SE,self.center )
+            arr =  edge_detection(arr,self.SE,self.center ,STANDARD)
             im = get_PIL_by_numpy(arr)
             
             self.show_file(im)
+
+    def edge_external(self):
+        if self.fname:
+            im = Image.open(self.fname)
+            if im.mode != 'RGB':
+                im = im.convert('RGB')
+
+            x, y = im.size
+            arr = np.array(im)
+
+            arr =  edge_detection(arr,self.SE,self.center ,EXTERNAL)
+            im = get_PIL_by_numpy(arr)
+            
+            self.show_file(im)
+
+    def edge_internal(self):
+        if self.fname:
+            im = Image.open(self.fname)
+            if im.mode != 'RGB':
+                im = im.convert('RGB')
+
+            x, y = im.size
+            arr = np.array(im)
+
+            arr =  edge_detection(arr,self.SE,self.center ,INTERNAL)
+            im = get_PIL_by_numpy(arr)
+            
+            self.show_file(im)
+
+
 
     def gradient(self):
          if self.fname:

@@ -1,5 +1,5 @@
 import numpy as np
-
+from util import *
 def erosion(arr,SE,center):   
     x=arr.shape[0]
     y=arr.shape[1]    
@@ -103,12 +103,23 @@ def check_small_than(a,b):
                 c[i,j,2] = min( a[i,j,2], b[i,j,2])  
     return c
 
+ 
 
-def edge_detection(arr,SE,center):
-    #gray scale dilation  
-    dilation_arr =  dilation(arr,SE,center)
-    erosion_arr = erosion(arr,SE,center) 
-    return dilation_arr - erosion_arr
+
+def edge_detection(arr,SE,center,mode): 
+    dilation_arr =  binary_dilation(arr,SE,center)
+    erosion_arr = binary_erosion(arr,SE,center)  
+
+    if mode == STANDARD: 
+        return dilation_arr - erosion_arr
+
+    if mode == EXTERNAL:
+        return   dilation_arr-arr
+
+    if mode == INTERNAL:
+        return  arr-erosion_arr
+
+    assert(0)
 
 def gradient(arr,SE,center):
     #gray scale dilation 

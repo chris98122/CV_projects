@@ -12,6 +12,11 @@ import numpy as np
 
 
 from PIL import Image 
+
+
+STANDARD = 1
+EXTERNAL =2
+INTERNAL =3
 def valid_SE(input):
     lines = input.split('\n') 
     linenum=len(lines)
