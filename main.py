@@ -60,10 +60,20 @@ class PhotoFilter(QWidget):
         edge_internal.triggered.connect(self.edge_internal )
 
  
-        gradient= QAction('Morphological gradient', self)
-        gradient.setShortcut('ctrl+M')
-        gradient.setStatusTip('Morphological gradient')
-        gradient.triggered.connect(self.gradient)
+        gradient_standard= QAction('Morphological gradient(Standard)', self)
+        gradient_standard.setShortcut('ctrl+M') 
+        gradient_standard.triggered.connect(self.gradient_standard)
+
+
+        gradient_external= QAction('Morphological gradient(External)', self)
+        gradient_external.setShortcut('ctrl+M') 
+        gradient_external.triggered.connect(self.gradient_external)
+
+        gradient_internal= QAction('Morphological gradient(Internal)', self)
+        gradient_internal.setShortcut('ctrl+M') 
+        gradient_internal.triggered.connect(self.gradient_internal)
+
+
 
         cond_dilation= QAction('Binary Reconstruction', self)
         cond_dilation.setShortcut('ctrl+N')
@@ -83,10 +93,15 @@ class PhotoFilter(QWidget):
 
         filterMenu.addAction(edge_standard)
         filterMenu.addAction(edge_external)
-        filterMenu.addAction(edge_internal)
+        filterMenu.addAction(edge_internal) 
+
+        filterMenu.addAction(gradient_standard) 
+        filterMenu.addAction(gradient_external) 
+        filterMenu.addAction(gradient_internal) 
 
 
-        filterMenu.addAction(gradient) 
+
+
         filterMenu.addAction(cond_dilation) 
         filterMenu.addAction(grey_reconstruction) 
         
@@ -230,9 +245,7 @@ class PhotoFilter(QWidget):
             
             self.show_file(im)
 
-
-
-    def gradient(self):
+    def gradient_standard(self):
          if self.fname:
             im = Image.open(self.fname)
             if im.mode != 'RGB':
@@ -241,10 +254,42 @@ class PhotoFilter(QWidget):
             x, y = im.size
             arr = np.array(im)
 
-            arr =  gradient(arr,self.SE,self.center )
+            arr =  gradient(arr,self.SE,self.center,STANDARD )
             im = get_PIL_by_numpy(arr)
             
             self.show_file(im)
+
+    def gradient_external(self):
+            if self.fname:
+                im = Image.open(self.fname)
+                if im.mode != 'RGB':
+                    im = im.convert('RGB')
+
+                x, y = im.size
+                arr = np.array(im)
+
+                arr =  gradient(arr,self.SE,self.center,EXTERNAL )
+                im = get_PIL_by_numpy(arr)
+                
+                self.show_file(im)
+
+
+    def gradient_internal(self):
+            if self.fname:
+                im = Image.open(self.fname)
+                if im.mode != 'RGB':
+                    im = im.convert('RGB')
+
+                x, y = im.size
+                arr = np.array(im)
+
+                arr =  gradient(arr,self.SE,self.center,INTERNAL )
+                im = get_PIL_by_numpy(arr)
+                
+                self.show_file(im)
+
+
+
 
     def cond_dilation(self): 
          if self.fname:

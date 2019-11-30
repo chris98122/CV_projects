@@ -104,8 +104,6 @@ def check_small_than(a,b):
     return c
 
  
-
-
 def edge_detection(arr,SE,center,mode): 
     dilation_arr =  binary_dilation(arr,SE,center)
     erosion_arr = binary_erosion(arr,SE,center)  
@@ -121,12 +119,20 @@ def edge_detection(arr,SE,center,mode):
 
     assert(0)
 
-def gradient(arr,SE,center):
+def gradient(arr,SE,center,mode):
     #gray scale dilation 
     dilation_arr =  dilation(arr,SE,center)
     erosion_arr = erosion(arr,SE,center)
+    if mode == STANDARD: 
+        return (dilation_arr - erosion_arr)/2
 
-    return (dilation_arr - erosion_arr)/2
+    if mode == EXTERNAL:
+        return  (dilation_arr-arr)/2
+
+    if mode == INTERNAL:
+        return  (arr-erosion_arr)/2
+ 
+    assert(0)
 
 def conditional_dilation(arr,SE,center): 
     M_arr = binary_dilation(binary_erosion(arr,SE,center) ,SE,center) 
