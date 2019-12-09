@@ -5,3 +5,14 @@ cv_project1/.vscode/settings.json
 cv_project1/lena.jpg
 cv_project1/dist/main.exe
 cv_project1/code.zip
+*.png
+*.jpg
+*.exe
+*.toc
+*.zip
+*.pkg
+*.manifest
+*.txt
+*.html
+*.pyz
+*.spec
